@@ -13,7 +13,7 @@ namespace InterfaceTweaks
         // The chapter glyph, and the glyph the second chapter menu's title puts before it.
         private const string Chapter = "science";
         private const string Second = "optional";
-        private const string Newline = "newline";
+        internal const string Newline = "newline";
         private const string Newpage = "newpage";
         // The game writes 7 as one glyph at the sevens place.
         private static string Number(int n) => n < 7 ? n.ToString() : "1e1";

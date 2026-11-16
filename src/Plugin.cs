@@ -23,6 +23,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> RightAlignSettings;
         internal static ConfigEntry<bool> NumberChapters;
         internal static ConfigEntry<bool> QuizNumberValues;
+        internal static ConfigEntry<bool> WinPages;
 
         private void Awake()
         {
@@ -36,6 +37,8 @@ namespace InterfaceTweaks
                 Described("Put each chapter's number before its name in the chapter menus and the chapter's title, numbered as the game's chapter achievements are.", "science number"));
             QuizNumberValues = Config.Bind("Quizzes", "NumberValues", true,
                 Described("Once the game shows numbers' values in parentheses, show them for numbers typed into quiz answers too.", "riddle number"));
+            WinPages = Config.Bind("Chapters", "WinPages", true,
+                Described("At the end of each chapter's menu, list the pages the game showed in the left panel when the chapter's wins reached certain counts.", "science unlock"));
 
             // Redraw the current page, so a change from Mod Settings shows at once.
             Config.SettingChanged += (_, _) => Global.manager?.UpdateText();

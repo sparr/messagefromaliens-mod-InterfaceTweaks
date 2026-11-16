@@ -11,6 +11,7 @@ Install BepInEx first, if you haven't already, as described under [Requirements]
 * **Exit confirmation**: The exit button in the home page's top-right menu opens a confirmation page instead of quitting immediately.
 * **Right-aligned settings**: On the game's settings page, each row's choices are moved to the right edge of the row, so they line up in a column instead of starting one cell after the row's name.
 * **Chapter numbers**: In the chapter menus, each chapter's name is preceded by its number, with a more descriptive prefix in the chapter's heading. These match the game's achievements and Discord spoiler threshold channels.
+* **Win pages**: When a chapter's wins reach certain counts, the game shows a page in the left panel, but no menu links to it, so after a restart it is gone. Each one you have unlocked is listed at the end of the menu that holds the chapter's last quiz, and opens on the right like the menu's other pages.
 * **Quiz number values**: Once the game shows numbers' values in parentheses after them, numbers typed into a quiz's answer slots get their values too, on the label of each number's last glyph. A number is a run of adjacent slots holding digits, with an optional negative sign, repeat, or scientific form, read the way the game writes numbers.
 
 ## Configuration
@@ -22,6 +23,7 @@ Install BepInEx first, if you haven't already, as described under [Requirements]
 | `ExitConfirmation.Enabled` | `true` | Ask before the exit button quits the game. |
 | `Settings.RightAlignChoices` | `true` | Line up settings rows' choices at the right edge. |
 | `Chapters.Numbers` | `true` | Number the chapters in the chapter menus and chapter titles, as the chapter achievements do. |
+| `Chapters.WinPages` | `true` | List the unlocked win pages at the end of each chapter's menu. |
 | `Quizzes.NumberValues` | `true` | Show the values of numbers typed into quiz answers, once the game shows numbers' values. |
 
 Each setting is tagged with its name in glyphs, and the mod names itself in glyphs, so Mod Settings can show them in the game.
@@ -56,7 +58,9 @@ For a game folder outside a Steam library, set `GameDir` to the game folder the 
 | `Draw.ToParentPage` | Prefix: when only the home page is on the page stack, where the game would quit, opens the confirmation page instead. |
 | `Draw.ToPage` | Prefix: on the confirmation page, quits for the yes line and returns to the home page for the no line. |
 | `Draw.CurrentPageIsMenu` | Postfix: true on the confirmation page, so its lines are drawn, highlighted, and clicked like a menu's. |
-| `Global.GetInfo` | Prefix: supplies the confirmation page's lines and its explanation. |
+| `Global.GetInfo` | Prefix: supplies the confirmation page's lines and its explanation. Postfix: adds the chapter's unlocked win pages to the end of the menu that holds its last quiz. |
+| `Global.GetWin` | Postfix: true for an unlocked win page, so its menu line shows as done, the menu can still be won, and reading the page records no win. |
+| `Global.SetWin` | Prefix: skips win pages, so they never add to a chapter's win count. |
 | `Draw.Write` | Prefix: in the chapter menus and a chapter's title, adds the chapter's number before its name, and in the title the glyphs for its menu. Postfix: removes those glyphs from the drawn lines' link targets, and highlights the lines of chapters that contain the marked word, which the game's own check misses because of the added glyphs. |
 | `Draw.Write` | Postfix: adds the values of numbers in the page's quiz answer slots to their labels. |
 | `AlienCharacter.UpdateEarthText` | Postfix: adds the value again when the game rewrites the label of an answer slot that ends a number. |
