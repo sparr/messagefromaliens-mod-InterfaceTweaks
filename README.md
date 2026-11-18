@@ -13,6 +13,10 @@ Install BepInEx first, if you haven't already, as described under [Requirements]
 * **Chapter numbers**: In the chapter menus, each chapter's name is preceded by its number, with a more descriptive prefix in the chapter's heading. These match the game's achievements and Discord spoiler threshold channels.
 * **Win pages**: When a chapter's wins reach certain counts, the game shows a page in the left panel, but no menu links to it, so after a restart it is gone. Each one you have unlocked is listed at the end of the menu that holds the chapter's last quiz, and opens on the right like the menu's other pages.
 * **Quiz number values**: Once the game shows numbers' values in parentheses after them, numbers typed into a quiz's answer slots get their values too, on the label of each number's last glyph. A number is a run of adjacent slots holding digits, with an optional negative sign, repeat, or scientific form, read the way the game writes numbers.
+* **Compact minesweeper**: On the minesweeper board, the board's glyphs have no translations under them, and its rows are drawn without gaps between them. The solution the game shows in the left panel after a wrong answer is drawn the same way.
+* **Centered minesweeper**: The minesweeper board is moved 3.5 cells right, to the middle of the right panel. With the compact board, it is also moved 1 cell down, away from the line under the page's text.
+
+Each minesweeper tweak has a row of glyphs in the board page's bottom-right corner, its name and then yes or no, that turns it on and off.
 
 ## Configuration
 
@@ -25,6 +29,8 @@ Install BepInEx first, if you haven't already, as described under [Requirements]
 | `Chapters.Numbers` | `true` | Number the chapters in the chapter menus and chapter titles, as the chapter achievements do. |
 | `Chapters.WinPages` | `true` | List the unlocked win pages at the end of each chapter's menu. |
 | `Quizzes.NumberValues` | `true` | Show the values of numbers typed into quiz answers, once the game shows numbers' values. |
+| `Minesweeper.CompactBoard` | `true` | Hide the translations of the minesweeper board and its solution, and close the gaps between their rows. |
+| `Minesweeper.CenterBoard` | `true` | Move the minesweeper board to the middle of the right panel, and with the compact board, 1 cell down. |
 
 Each setting is tagged with its name in glyphs, and the mod names itself in glyphs, so Mod Settings can show them in the game.
 
@@ -65,3 +71,9 @@ For a game folder outside a Steam library, set `GameDir` to the game folder the 
 | `Draw.Write` | Postfix: adds the values of numbers in the page's quiz answer slots to their labels. |
 | `AlienCharacter.UpdateEarthText` | Postfix: adds the value again when the game rewrites the label of an answer slot that ends a number. |
 | `Draw.Write` | Prefix: on the settings page and pages opened from it, fills each choice row's gap with empty cells up to the row's width of 12. |
+| `Draw.UpdateText1` | Prefix: returns the board's glyphs to their usual positions. Postfix: on the board and the left panel's solution page, hides the board's translations and moves its rows up to close the gaps when compact, and on the board, moves its glyphs and the cells' frames when centered and moves the frames' rows together when compact. |
+| `Draw.Update` | Prefix (last), postfix (first), and finalizer: mark the game's own `Update` as running, and as done even if it throws, so the `Camera.ScreenToWorldPoint` patch applies only to the game's mouse tests. |
+| `Camera.ScreenToWorldPoint(Vector3)` | Postfix: during the game's `Draw.Update` on the minesweeper board, maps the mouse's point on the compact or moved board back to the game's layout, so clicks and hovering find the cell drawn under the mouse. |
+| `Draw.UpdateText1` | Postfix: on the minesweeper board, draws a toggle for each minesweeper tweak in the bottom-right corner. |
+| `Draw.Update` | Prefix: a left click on a toggle flips its setting. |
+| `HardwareCursor.Apply` | Prefix: gives the toggles the game's button cursor when the mouse is over them. |
