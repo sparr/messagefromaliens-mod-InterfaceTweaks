@@ -85,12 +85,7 @@ namespace InterfaceTweaks
         [HarmonyPatch]
         private static class WritePatch
         {
-            private static System.Reflection.MethodBase TargetMethod() =>
-                AccessTools.Method(typeof(Draw), nameof(Draw.Write), new[]
-                {
-                    typeof(string), typeof(int), typeof(int), typeof(int), typeof(bool), typeof(bool),
-                    typeof(bool), typeof(float), typeof(string), typeof(float), typeof(bool), typeof(int), typeof(int),
-                });
+            private static System.Reflection.MethodBase TargetMethod() => GameText.WriteString();
 
             private static void Prefix(Draw __instance, ref string s, string sec, out Dictionary<string, string> __state)
             {
