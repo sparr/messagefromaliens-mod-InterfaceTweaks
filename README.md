@@ -71,8 +71,8 @@ For a game folder outside a Steam library, set `GameDir` to the game folder the 
 | `Global.GetWin` | Postfix: true for an unlocked win page, so its menu line shows as done, the menu can still be won, and reading the page records no win. |
 | `Global.SetWin` | Prefix: skips win pages, so they never add to a chapter's win count. |
 | `Draw.Write` | Prefix: in the chapter menus and a chapter's title, adds the chapter's number before its name, and in the title the glyphs for its menu. Postfix: removes those glyphs from the drawn lines' link targets, and highlights the lines of chapters that contain the marked word, which the game's own check misses because of the added glyphs. |
-| `Draw.Write` | Postfix: adds the values of numbers in the page's quiz answer slots to their labels. |
-| `AlienCharacter.UpdateEarthText` | Postfix: adds the value again when the game rewrites the label of an answer slot that ends a number. |
+| `Draw.Write` | Prefix: notes that the page's answer slots are being drawn. Postfix: adds the values of numbers in the page's quiz answer slots to their labels. |
+| `AlienCharacter.UpdateEarthText` | Postfix: adds the value again when the game rewrites the label of the glyph that ends a number in the answer slots. |
 | `Draw.Write` | Prefix: on the settings page and pages opened from it, fills each choice row's gap with empty cells up to the row's width of 12. |
 | `Draw.UpdateText1` | Prefix: returns the board's glyphs to their usual positions. Postfix: on the board and the left panel's solution page, hides the board's translations and moves its rows up to close the gaps when compact, and on the board, moves its glyphs and the cells' frames when centered and moves the frames' rows together when compact. |
 | `Draw.Update` | Prefix (last), postfix (first), and finalizer: mark the game's own `Update` as running, and as done even if it throws, so the `Camera.ScreenToWorldPoint` patch applies only to the game's mouse tests. |
