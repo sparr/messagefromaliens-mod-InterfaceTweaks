@@ -57,7 +57,7 @@ namespace InterfaceTweaks
         private static void Index()
         {
             var messages = Global.alien_message;
-            if (messages == null || ReferenceEquals(messages, indexed) || Global.message_source == null)
+            if (messages == null || ReferenceEquals(messages, indexed) || Global.link_message == null)
             {
                 return;
             }
@@ -87,10 +87,24 @@ namespace InterfaceTweaks
                     }
                 }
             }
+            // Each menu's lines, gated or not, which the game lists only once at startup. Its other
+            // index, of lines by menu, holds only lines whose gates had passed then.
+            var menuOf = new Dictionary<string, string>();
+            foreach (var kv in Global.link_message)
+            {
+                foreach (var line in kv.Value)
+                {
+                    var name = line.Trim();
+                    if (!menuOf.ContainsKey(name))
+                    {
+                        menuOf[name] = kv.Key;
+                    }
+                }
+            }
             var listed = 0;
             foreach (var page in pages.Values.OrderBy(p => p.Chapter, StringComparer.Ordinal).ThenBy(p => p.Wins))
             {
-                if (!lastQuiz.TryGetValue(page.Chapter, out var last) || !Global.message_source.TryGetValue(last.Name, out var menu))
+                if (!lastQuiz.TryGetValue(page.Chapter, out var last) || !menuOf.TryGetValue(last.Name, out var menu))
                 {
                     Plugin.Log.LogWarning($"Win pages: no menu for {page.Name}");
                     continue;
