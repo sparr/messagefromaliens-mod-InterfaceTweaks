@@ -24,6 +24,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> NumberChapters;
         internal static ConfigEntry<bool> QuizNumberValues;
         internal static ConfigEntry<bool> CombinedNumbers;
+        internal static ConfigEntry<bool> WordUnits;
         internal static ConfigEntry<bool> WinPages;
         internal static ConfigEntry<bool> PageNotes;
         internal static ConfigEntry<bool> CompactMinesweeper;
@@ -45,6 +46,8 @@ namespace InterfaceTweaks
                 Described("Once the game shows numbers' values in parentheses, show them for numbers typed into quiz answers too.", "riddle number"));
             CombinedNumbers = Config.Bind("Numbers", "CombinedLabels", true,
                 Described("Once the game shows numbers' values in parentheses, give each number one label under all of its glyphs: its value in base 7 as its glyphs write it, then in base 10, and the unit after it with its value in human units once the game shows those. The glyphs' own labels show while the mouse is over the number.", "connect number"));
+            WordUnits = Config.Bind("Numbers", "WordUnits", true,
+                Described("Where the game's text writes a number and then a unit as a separate word, give the unit the value in human units the game gives units written with their number, shown once the game shows those.", "unit word"));
             WinPages = Config.Bind("Chapters", "WinPages", true,
                 Described("At the end of each chapter's menu, list the pages the game showed in the left panel when the chapter's wins reached certain counts.", "science unlock"));
             PageNotes = Config.Bind("Notes", "PageNotes", true,
