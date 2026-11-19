@@ -27,13 +27,20 @@ namespace InterfaceTweaks
             public int RowFirst;
             public int RowLast;
             public string Text;
+            // The repeating digits' characters in Text, drawn with a line above them.
+            public int RepeatStart;
+            public int RepeatLength;
             public bool Combined;
+            // The first of this number's lines in overlines, or -1 when it has no repeating digits.
+            public int LineSlot = -1;
         }
 
         private static readonly List<Number> numbers = new List<Number>();
         private static readonly Dictionary<AlienCharacter, Number> numberOf = new Dictionary<AlienCharacter, Number>();
         private static readonly HashSet<AlienCharacter> hidden = new HashSet<AlienCharacter>();
         private static Number revealed;
+        // Lines drawn above repeating digits, reused from frame to frame.
+        private static readonly List<LineRenderer> overlines = new List<LineRenderer>();
 
         private static bool Enabled() =>
             Plugin.CombinedNumbers.Value && QuizNumberValues.ValuesShown() && Global.savedata?.dict != null
@@ -136,8 +143,14 @@ namespace InterfaceTweaks
                     FindNumbers(run, slots);
                 }
             }
+            var slot = 0;
             foreach (var n in numbers)
             {
+                if (n.RepeatLength > 0)
+                {
+                    n.LineSlot = slot;
+                    slot += LinesPerNumber;
+                }
                 Combine(n);
             }
         }
@@ -185,7 +198,7 @@ namespace InterfaceTweaks
                 }
                 QuizNumberValues.ReadNumber(glyphs.GetRange(0, end), j, out var value, out var repeats);
                 var single = end == j + 1 && QuizNumberValues.IsPlace(glyphs[j], out _, out _);
-                var base7 = Base7(glyphs, j, end);
+                var base7 = Base7(glyphs, j, end, out var repeatStart, out var repeatLength);
                 var base10 = HasValue(last)
                     ? last.extra_info.Substring(0, last.extra_info.Length - "number".Length)
                     : "(" + QuizNumberValues.Format(value, repeats, single) + ")";
@@ -194,7 +207,7 @@ namespace InterfaceTweaks
                 {
                     text.Append(' ').Append(base10);
                 }
-                var n = new Number();
+                var n = new Number { RepeatStart = repeatStart, RepeatLength = repeatLength };
                 n.Cells.AddRange(run.GetRange(j, end - j));
                 // In "1 to 2 year" the unit belongs to both numbers, so it keeps its own label.
                 var shared = j == lastEnd + 1 && Joins(glyphs[j - 1]) && !lastHadUnit;
@@ -253,10 +266,13 @@ namespace InterfaceTweaks
         // inside an alternative, so "near to" is not "to".
         private static readonly System.Text.RegularExpressions.Regex Alternatives = new System.Text.RegularExpressions.Regex(@"[^\p{L}\p{N}\s'-]+");
 
-        // The number in base 7 as its glyphs write it: digits with a point, repeating digits in
-        // brackets, and E and the exponent only after the scientific glyph.
-        internal static string Base7(List<string> glyphs, int start, int end)
+        // The number in base 7 as its glyphs write it: digits with a point, and E and the
+        // exponent only after the scientific glyph. repeatStart and repeatLength give the
+        // repeating digits' characters, or a length of 0.
+        internal static string Base7(List<string> glyphs, int start, int end, out int repeatStart, out int repeatLength)
         {
+            repeatStart = 0;
+            repeatLength = 0;
             var i = start;
             var negative = glyphs[i] == QuizNumberValues.Negative;
             if (negative)
@@ -304,13 +320,15 @@ namespace InterfaceTweaks
                 i++;
                 // The repeating digits start this many places below the last written digit after
                 // the point, or below the point, as QuizNumberValues.ReadNumber reads them.
-                fraction.Append('0', zeros).Append('[');
+                fraction.Append('0', zeros);
+                // The point and the digits before it come first.
+                repeatStart = s.Length + 1 + fraction.Length;
                 while (i < end && QuizNumberValues.IsDigit(glyphs[i]))
                 {
                     fraction.Append(glyphs[i]);
+                    repeatLength++;
                     i++;
                 }
-                fraction.Append(']');
             }
             if (fraction.Length > 0)
             {
@@ -441,6 +459,7 @@ namespace InterfaceTweaks
                 return;
             }
             n.Combined = false;
+            HideOverlines(n, 0);
             Place(n.Host, n.Host, 1);
             foreach (var c in n.Cells)
             {
@@ -469,6 +488,108 @@ namespace InterfaceTweaks
             numbers.Clear();
             numberOf.Clear();
             revealed = null;
+            ShowOverlines(0);
+        }
+
+        // At most this many lines per number: its repeating digits on each line the label wraps.
+        private const int LinesPerNumber = 2;
+
+        // A line above each text line's run of the number's repeating digits, as repeating
+        // decimals are written in English, placed from where TMP last laid out the digits.
+        private static void DrawOverlines(Number n)
+        {
+            var used = 0;
+            var cam = Camera.main;
+            var d = Global.manager;
+            var tc = n.Host?.txt?.textComponent;
+            if (n.LineSlot >= 0 && n.Combined && cam != null && d != null && tc != null && tc.enabled && tc.gameObject.activeInHierarchy && n.Host.sp != null)
+            {
+                var info = tc.textInfo;
+                // Screen points map to the glyphs' plane by the scale between the host glyph's
+                // world and screen positions.
+                var origin = n.Host.sp.transform.position;
+                Vector2 originScreen = cam.WorldToScreenPoint(origin);
+                var scale = ((Vector2)cam.WorldToScreenPoint(origin + Vector3.right) - originScreen).x;
+                // The repeating digits' extent on each line the label wraps them onto.
+                var spans = new SortedDictionary<int, (float Left, float Right, float Top, float Size)>();
+                for (var k = n.RepeatStart; scale > 0f && k < n.RepeatStart + n.RepeatLength && info != null && k < info.characterCount; k++)
+                {
+                    var c = info.characterInfo[k];
+                    if (!c.isVisible)
+                    {
+                        continue;
+                    }
+                    spans[c.lineNumber] = spans.TryGetValue(c.lineNumber, out var sp)
+                        ? (Mathf.Min(sp.Left, c.topLeft.x), Mathf.Max(sp.Right, c.topRight.x), Mathf.Max(sp.Top, c.topLeft.y), sp.Size)
+                        : (c.topLeft.x, c.topRight.x, c.topLeft.y, c.pointSize);
+                }
+                foreach (var span in spans.Values)
+                {
+                    if (used == LinesPerNumber)
+                    {
+                        break;
+                    }
+                    var y = span.Top + span.Size * 0.1f;
+                    // The label canvas is screen space, so its world coordinates are screen pixels.
+                    Vector2 a = tc.transform.TransformPoint(new Vector3(span.Left, y));
+                    Vector2 b = tc.transform.TransformPoint(new Vector3(span.Right, y));
+                    var line = Overline(d, n.LineSlot + used++);
+                    line.SetPosition(0, origin + (Vector3)((a - originScreen) / scale));
+                    line.SetPosition(1, origin + (Vector3)((b - originScreen) / scale));
+                    line.startColor = line.endColor = tc.color;
+                    line.startWidth = line.endWidth = Mathf.Max(1f, span.Size * 0.07f) / scale;
+                }
+            }
+            HideOverlines(n, used);
+        }
+
+        // Hides the number's lines past the first count.
+        private static void HideOverlines(Number n, int count)
+        {
+            for (var i = count; n.LineSlot >= 0 && i < LinesPerNumber && n.LineSlot + i < overlines.Count; i++)
+            {
+                var l = overlines[n.LineSlot + i];
+                if (l != null && l.gameObject.activeSelf)
+                {
+                    l.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        private static LineRenderer Overline(Draw d, int i)
+        {
+            while (overlines.Count <= i || overlines[i] == null)
+            {
+                var line = d.DrawLineRenderer(Vector2.zero, Vector2.zero, 0);
+                line.gameObject.name = "InterfaceTweaks.Overline";
+                line.positionCount = 2;
+                if (overlines.Count <= i)
+                {
+                    overlines.Add(line);
+                }
+                else
+                {
+                    overlines[i] = line;
+                }
+            }
+            var l = overlines[i];
+            if (!l.gameObject.activeSelf)
+            {
+                l.gameObject.SetActive(true);
+            }
+            return l;
+        }
+
+        // Hides the lines past the first count.
+        private static void ShowOverlines(int count)
+        {
+            for (var i = count; i < overlines.Count; i++)
+            {
+                if (overlines[i] != null && overlines[i].gameObject.activeSelf)
+                {
+                    overlines[i].gameObject.SetActive(false);
+                }
+            }
         }
 
         private static bool InUse(TMP_InputField field)
@@ -520,6 +641,7 @@ namespace InterfaceTweaks
         {
             if (numbers.Count == 0)
             {
+                ShowOverlines(0);
                 return;
             }
             if (!Enabled())
@@ -529,6 +651,7 @@ namespace InterfaceTweaks
                     Separate(n);
                 }
                 Clear();
+                ShowOverlines(0);
                 return;
             }
             var next = Wanted();
@@ -543,6 +666,10 @@ namespace InterfaceTweaks
                 {
                     Separate(next);
                 }
+            }
+            foreach (var n in numbers)
+            {
+                DrawOverlines(n);
             }
             // Another mod may show a hidden label again, as Compound Translations does for glyphs
             // that leave a run.
