@@ -164,10 +164,13 @@ namespace InterfaceTweaks
             return i;
         }
 
-        // How the game writes a value in a label: a fraction where its text gives one, which a
-        // repeating number stands for, and otherwise as a decimal.
-        private static string Format(Ratio value, bool repeats) =>
-            repeats && !value.D.IsOne ? value.N + "/" + value.D : Global.FloatToString(value.ToDouble());
+        // How the game writes a value in a label: a whole number as itself, a fraction where its
+        // text gives one, which a repeating number or a lone digit below the point stands for, and
+        // otherwise as a decimal.
+        private static string Format(Ratio value, bool repeats, bool single) =>
+            value.D.IsOne ? value.N.ToString()
+            : repeats || single ? value.N + "/" + value.D
+            : Global.FloatToString(value.ToDouble());
 
         private static bool IsNumberGlyph(string glyph) =>
             IsPlace(glyph, out _, out _) || glyph == Negative || glyph == Scientific || Array.IndexOf(Repeat, glyph) >= 0;
@@ -259,6 +262,7 @@ namespace InterfaceTweaks
                 while (j < glyphs.Count)
                 {
                     var end = ReadNumber(glyphs, j, out var value, out var repeats);
+                    var single = end == j + 1 && IsPlace(glyphs[j], out _, out _);
                     if (end < 0)
                     {
                         j++;
@@ -267,7 +271,7 @@ namespace InterfaceTweaks
                     var last = run[end - 1];
                     if ((only == null || only == last) && last?.txt != null && !last.txt.isFocused && !string.IsNullOrEmpty(last.txt.text))
                     {
-                        last.txt.text += " (" + Format(value, repeats) + ")";
+                        last.txt.text += " (" + Format(value, repeats, single) + ")";
                     }
                     j = end;
                 }
