@@ -34,7 +34,7 @@ namespace InterfaceTweaks
             Log = Logger;
 
             ConfirmExit = Config.Bind("ExitConfirmation", "Enabled", true,
-                Described("Ask for confirmation before the home page's exit button quits the game.", "whether end"));
+                Described("Ask for confirmation before the home page's exit button quits the game.", "end"));
             RightAlignSettings = Config.Bind("Settings", "RightAlignChoices", true,
                 Described("On the settings page and the pages under it, line up each row's choices at the right edge instead of one cell after its name.", "right option"));
             NumberChapters = Config.Bind("Chapters", "Numbers", true,
