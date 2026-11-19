@@ -271,8 +271,8 @@ namespace InterfaceTweaks
             return runs;
         }
 
-        // Adds the value to the label of each number's last glyph in the run that holds the given
-        // glyph, or in every run if it is null.
+        // Adds each number's value to the label of its last glyph, in every run, or with only, just
+        // the number whose last glyph that is.
         private static void Annotate(Draw d, AlienCharacter only)
         {
             if (d?.slots == null || d.slots.Count == 0 || !Shown())
@@ -345,7 +345,8 @@ namespace InterfaceTweaks
                 try
                 {
                     var d = Global.manager;
-                    if (!writing && d?.slots != null && d.slots.Count > 0 && __instance.sector == "righttextdown")
+                    // Only a number's glyphs are labeled.
+                    if (!writing && d?.slots != null && d.slots.Count > 0 && __instance.sector == "righttextdown" && IsNumberGlyph(__instance.alien_txt))
                     {
                         Annotate(d, __instance);
                     }
