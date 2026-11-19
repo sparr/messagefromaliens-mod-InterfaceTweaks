@@ -26,6 +26,8 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> WinPages;
         internal static ConfigEntry<bool> CompactMinesweeper;
         internal static ConfigEntry<bool> CenterMinesweeper;
+        internal static ConfigEntry<bool> UndoEnabled;
+        internal static ConfigEntry<KeyboardShortcut> UndoShortcut;
 
         private void Awake()
         {
@@ -45,6 +47,10 @@ namespace InterfaceTweaks
                 Described("On the minesweeper board and the solution shown after a wrong answer, hide the translations and close the gaps between rows. Also toggled by the glyphs in the board page's bottom-right corner.", "trap tohide", gate: MinesweeperLayout.BoardGate));
             CenterMinesweeper = Config.Bind("Minesweeper", "CenterBoard", true,
                 Described("Move the minesweeper board 3.5 cells right, to the middle of the right panel, and with the compact board, 1 cell down. Also toggled by the glyphs in the board page's bottom-right corner.", "trap center", gate: MinesweeperLayout.BoardGate));
+            UndoEnabled = Config.Bind("Undo", "Enabled", true,
+                Described("Keep a list of translation changes, and undo the latest with the undo shortcut, returning to the page it was made on. Changes made on a screen that can no longer be shown, such as before a game's turn, are dropped.", "anti translate"));
+            UndoShortcut = Config.Bind("Undo", "Shortcut", new KeyboardShortcut(UnityEngine.KeyCode.Z, UnityEngine.KeyCode.LeftControl),
+                "The key that undoes the latest translation change, when no label is being edited.");
 
             // Redraw the current page, so a change from Mod Settings shows at once.
             Config.SettingChanged += (_, _) => Global.manager?.UpdateText();
