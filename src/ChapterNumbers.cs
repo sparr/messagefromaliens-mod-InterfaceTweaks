@@ -15,8 +15,12 @@ namespace InterfaceTweaks
         private const string Second = "optional";
         internal const string Newline = "newline";
         private const string Newpage = "newpage";
-        // The game writes 7 as one glyph at the sevens place.
-        private static string Number(int n) => n < 7 ? n.ToString() : "1e1";
+        // A number's glyphs, in base 7 as the game writes it.
+        private static string Number(int n) => string.Join(" ", Global.ToBase7(n));
+
+        // The prefix's tokens as the game parses text: each number gets the value token that
+        // labels its last glyph, as the game's own numbers do. Value tokens take no cell.
+        private static List<string> Parsed(string prefix) => Global.StringToListString(prefix);
 
         // The glyphs to put before a chapter's name in its title, or null if the name is not a
         // chapter's. In a menu, the menu says which list the chapter is from, so only the number.
@@ -68,9 +72,9 @@ namespace InterfaceTweaks
                 var prefix = first >= 0 && chapters.Contains(line) ? PrefixFor(line, false) : null;
                 if (prefix != null)
                 {
-                    var added = prefix.Split(' ');
+                    var added = Parsed(prefix);
                     tokens.InsertRange(first, added);
-                    i += added.Length;
+                    i += added.Count;
                     renamed[prefix + " " + line] = line;
                 }
                 start = i + 1;
@@ -111,7 +115,7 @@ namespace InterfaceTweaks
                     }
                     else if (sec == "righttitle" && (s == page || s.StartsWith(page + " ")) && PrefixFor(page, true) is string prefix)
                     {
-                        s = prefix + " " + s;
+                        s = string.Join(" ", Parsed(prefix)) + " " + s;
                         __state = new Dictionary<string, string> { [prefix + " " + page] = page };
                     }
                 }
