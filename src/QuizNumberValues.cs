@@ -76,7 +76,15 @@ namespace InterfaceTweaks
             public static Ratio operator +(Ratio a, Ratio b) => new Ratio(a.N * b.D + b.N * a.D, a.D * b.D);
             public static Ratio operator *(Ratio a, Ratio b) => new Ratio(a.N * b.N, a.D * b.D);
             internal Ratio Negate() => new Ratio(-N, D);
-            internal double ToDouble() => Math.Exp(BigInteger.Log(BigInteger.Abs(N)) - BigInteger.Log(D)) * N.Sign;
+            // Exact to a double's precision where both parts fit in one, as they do for any number
+            // a quiz shows.
+            internal double ToDouble()
+            {
+                double n = (double)N, d = (double)D;
+                return !double.IsInfinity(n) && !double.IsInfinity(d)
+                    ? n / d
+                    : Math.Exp(BigInteger.Log(BigInteger.Abs(N)) - BigInteger.Log(D)) * N.Sign;
+            }
         }
 
         // Digits at strictly falling places, as the game writes a number. Returns the index after
