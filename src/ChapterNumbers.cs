@@ -39,10 +39,6 @@ namespace InterfaceTweaks
             return null;
         }
 
-        // Draw.Write gives these tokens no cell of their own.
-        private static bool TakesCell(string token) =>
-            token != "" && token[0] != '(' && token[0] != '[' && token[0] != '*' && token[0] != '@';
-
         // Adds the numbers to the chapter lines of a chapter menu, noting each line's drawn text
         // and the name it should open.
         private static string NumberMenu(string text, List<string> chapters, Dictionary<string, string> renamed)
@@ -59,7 +55,7 @@ namespace InterfaceTweaks
                 var name = new List<string>();
                 for (var j = start; j < i; j++)
                 {
-                    if (TakesCell(tokens[j]))
+                    if (GameText.TakesCell(tokens[j]))
                     {
                         if (first < 0)
                         {

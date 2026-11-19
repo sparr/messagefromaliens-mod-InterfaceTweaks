@@ -16,10 +16,6 @@ namespace InterfaceTweaks
 
         private static bool Applies(Draw d) => d?.parent_page != null && d.parent_page.Contains(SettingsPage);
 
-        // Draw.Write gives these tokens no cell of their own.
-        private static bool TakesCell(string token) =>
-            token != "" && token[0] != '(' && token[0] != '[' && token[0] != '*' && token[0] != '@';
-
         internal static string Align(string text)
         {
             var tokens = text.Split(' ').ToList();
@@ -33,7 +29,7 @@ namespace InterfaceTweaks
                 }
                 var row = tokens.GetRange(start, i - start);
                 var gap = row.IndexOf(Gap);
-                var cells = row.Count(TakesCell);
+                var cells = row.Count(GameText.TakesCell);
                 // Only rows with choices after the gap, and room to spare.
                 if (gap > 0 && gap < row.Count - 1 && cells < RowWidth)
                 {
