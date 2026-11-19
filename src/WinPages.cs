@@ -102,11 +102,13 @@ namespace InterfaceTweaks
                 }
             }
             var listed = 0;
+            var unlisted = 0;
             foreach (var page in pages.Values.OrderBy(p => p.Chapter, StringComparer.Ordinal).ThenBy(p => p.Wins))
             {
                 if (!lastQuiz.TryGetValue(page.Chapter, out var last) || !menuOf.TryGetValue(last.Name, out var menu))
                 {
-                    Plugin.Log.LogWarning($"Win pages: no menu for {page.Name}");
+                    // Not named, since its name is made of word IDs.
+                    unlisted++;
                     continue;
                 }
                 if (!menus.TryGetValue(menu, out var list))
@@ -117,6 +119,10 @@ namespace InterfaceTweaks
                 listed++;
             }
             Plugin.Log.LogInfo($"Win pages: {pages.Count} found, {listed} listed in {menus.Count} menus");
+            if (unlisted > 0)
+            {
+                Plugin.Log.LogWarning($"Win pages: {unlisted} have no menu that holds their chapter's last quiz");
+            }
         }
 
         // The game shows a chapter's win page when the chapter's count of wins reaches the page's.
