@@ -12,14 +12,14 @@ namespace InterfaceTweaks
     internal static class QuizNumberValues
     {
         // The game shows values once the player has won this many of these quizzes.
-        private const string ValuesQuizzes = "arithmetic riddle";
-        private const int ValuesWins = 11;
-        private const string Negative = "negative";
-        private const string Scientific = "exp7";
+        internal const string ValuesQuizzes = "arithmetic riddle";
+        internal const int ValuesWins = 11;
+        internal const string Negative = "negative";
+        internal const string Scientific = "exp7";
         // Repeat glyphs by the number of zero places between the last written digit, or the
         // point, and the repeating digits. The game's glyph for four or more zero places has no
         // single value, so it ends a number.
-        private static readonly string[] Repeat = { "loop", "loop1", "loop2", "loop3" };
+        internal static readonly string[] Repeat = { "loop", "loop1", "loop2", "loop3" };
 
         // A digit at a place: "3" is 3, "3e2" is 3 * 7^2, "3e-1" is 3 / 7.
         private static readonly Regex PlaceGlyph = new Regex(@"^([0-6])(?:e(-?\d+))?$");
@@ -27,11 +27,14 @@ namespace InterfaceTweaks
         // True while Draw.Write runs, when the answer slots are not all drawn yet.
         private static bool writing;
 
-        private static bool Shown() =>
-            Plugin.QuizNumberValues.Value && Global.globalData != null && Global.globalData.convert
+        // Whether the game shows numbers' values in labels.
+        internal static bool ValuesShown() =>
+            Global.globalData != null && Global.globalData.convert
             && Global.savedata?.win != null && Global.CountWin(ValuesQuizzes) >= ValuesWins;
 
-        private static bool IsPlace(string glyph, out int digit, out int place)
+        private static bool Shown() => Plugin.QuizNumberValues.Value && ValuesShown();
+
+        internal static bool IsPlace(string glyph, out int digit, out int place)
         {
             digit = 0;
             place = 0;
@@ -45,10 +48,10 @@ namespace InterfaceTweaks
             return true;
         }
 
-        private static bool IsDigit(string glyph) => glyph != null && glyph.Length == 1 && glyph[0] >= '0' && glyph[0] <= '6';
+        internal static bool IsDigit(string glyph) => glyph != null && glyph.Length == 1 && glyph[0] >= '0' && glyph[0] <= '6';
 
         // An exact value n / d, with d > 0.
-        private readonly struct Ratio
+        internal readonly struct Ratio
         {
             internal readonly BigInteger N;
             internal readonly BigInteger D;
@@ -105,7 +108,7 @@ namespace InterfaceTweaks
         // Reads the number starting at glyphs[start]: an optional negative glyph, digits, then
         // optionally a repeat glyph and its digits, then optionally the scientific glyph and a
         // whole exponent. Returns the index after its last glyph, or -1 if none starts there.
-        private static int ReadNumber(List<string> glyphs, int start, out Ratio value, out bool repeats)
+        internal static int ReadNumber(List<string> glyphs, int start, out Ratio value, out bool repeats)
         {
             value = new Ratio(0, 1);
             repeats = false;
@@ -167,12 +170,12 @@ namespace InterfaceTweaks
         // How the game writes a value in a label: a whole number as itself, a fraction where its
         // text gives one, which a repeating number or a lone digit below the point stands for, and
         // otherwise as a decimal.
-        private static string Format(Ratio value, bool repeats, bool single) =>
+        internal static string Format(Ratio value, bool repeats, bool single) =>
             value.D.IsOne ? value.N.ToString()
             : repeats || single ? value.N + "/" + value.D
             : Global.FloatToString(value.ToDouble());
 
-        private static bool IsNumberGlyph(string glyph) =>
+        internal static bool IsNumberGlyph(string glyph) =>
             IsPlace(glyph, out _, out _) || glyph == Negative || glyph == Scientific || Array.IndexOf(Repeat, glyph) >= 0;
 
         // Cells in a row of text, as Draw.Write wraps it: a row that continues on the next
