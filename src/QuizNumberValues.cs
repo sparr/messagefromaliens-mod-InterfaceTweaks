@@ -175,19 +175,44 @@ namespace InterfaceTweaks
         private static bool IsNumberGlyph(string glyph) =>
             IsPlace(glyph, out _, out _) || glyph == Negative || glyph == Scientific || Array.IndexOf(Repeat, glyph) >= 0;
 
-        // The glyph drawn in the grid cell at x, y if it directly follows or precedes the glyph a
-        // in the same row of the same text, or null.
+        // Cells in a row of text, as Draw.Write wraps it: a row that continues on the next
+        // starts one cell in, or at the first cell for text written without spacing.
+        private const int RowWidth = 12;
+        private static readonly System.Reflection.FieldInfo NoSpacing = AccessTools.Field(typeof(Draw), "r_nospacing");
+
+        // The glyph a's grid cell is x, y. The glyph that directly follows (step 1) or precedes
+        // (step -1) it in the same sentence, across a wrapped row too, or null.
         private static AlienCharacter Neighbor(Draw d, AlienCharacter a, int x, int y, int step)
         {
+            var b = At(d, a, x + step, y, a.line_y, a.line_x + step);
+            if (b != null)
+            {
+                return b;
+            }
+            var indent = (bool)NoSpacing.GetValue(d) ? 0 : 1;
+            var first = x - a.line_x;
+            if (step > 0 && a.line_x == RowWidth - 1)
+            {
+                return At(d, a, first + indent, y - 1, a.line_y - 1, indent);
+            }
+            if (step < 0 && a.line_x == indent)
+            {
+                return At(d, a, first + RowWidth - 1, y + 1, a.line_y + 1, RowWidth - 1);
+            }
+            return null;
+        }
+
+        // The glyph drawn in the grid cell at x, y if it is in a's sentence at that row and column.
+        private static AlienCharacter At(Draw d, AlienCharacter a, int x, int y, int row, int column)
+        {
             var grid = d.alien_slots;
-            x += step;
-            if (grid == null || x < 0 || x >= grid.GetLength(0))
+            if (grid == null || x < 0 || x >= grid.GetLength(0) || y < 0 || y >= grid.GetLength(1))
             {
                 return null;
             }
             var b = grid[x, y];
             return b != null && b.gameObject.activeSelf && b.sector == a.sector && b.page == a.page
-                && b.line == a.line && b.line_y == a.line_y && b.line_x == a.line_x + step ? b : null;
+                && b.line == a.line && b.line_y == row && b.line_x == column ? b : null;
         }
 
         // A drawn glyph that joins the answer slots beside it into one number: a number glyph the
@@ -226,13 +251,16 @@ namespace InterfaceTweaks
                 }
                 var run = new List<AlienCharacter> { slot };
                 var cur = slot;
-                for (var lx = x; Neighbor(d, cur, lx, y, -1) is AlienCharacter b && Joins(d, b); lx--)
+                int cx = x, cy = y;
+                while (Neighbor(d, cur, cx, cy, -1) is AlienCharacter b && Joins(d, b) && Find(d, b, out cx, out cy))
                 {
                     run.Insert(0, b);
                     cur = b;
                 }
                 cur = slot;
-                for (var rx = x; Neighbor(d, cur, rx, y, 1) is AlienCharacter b && (d.slots.Contains(b) || Joins(d, b)); rx++)
+                cx = x;
+                cy = y;
+                while (Neighbor(d, cur, cx, cy, 1) is AlienCharacter b && (d.slots.Contains(b) || Joins(d, b)) && Find(d, b, out cx, out cy))
                 {
                     run.Add(b);
                     done.Add(b);
