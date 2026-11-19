@@ -25,6 +25,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> QuizNumberValues;
         internal static ConfigEntry<bool> CombinedNumbers;
         internal static ConfigEntry<bool> WinPages;
+        internal static ConfigEntry<bool> PageNotes;
         internal static ConfigEntry<bool> CompactMinesweeper;
         internal static ConfigEntry<bool> CenterMinesweeper;
         internal static ConfigEntry<bool> UndoEnabled;
@@ -46,6 +47,8 @@ namespace InterfaceTweaks
                 Described("Once the game shows numbers' values in parentheses, give each number one label under all of its glyphs: its value in base 7 as its glyphs write it, then in base 10, and the unit after it with its value in human units once the game shows those. The glyphs' own labels show while the mouse is over the number.", "connect number"));
             WinPages = Config.Bind("Chapters", "WinPages", true,
                 Described("At the end of each chapter's menu, list the pages the game showed in the left panel when the chapter's wins reached certain counts.", "science unlock"));
+            PageNotes = Config.Bind("Notes", "PageNotes", true,
+                Described("While the left panel shows a page's explanation, the explain button opens a notes page for that page instead, with a field for English text. While a page's notes show, opening another page shows its notes.", "page draw"));
             CompactMinesweeper = Config.Bind("Minesweeper", "CompactBoard", true,
                 Described("On the minesweeper board and the solution shown after a wrong answer, hide the translations and close the gaps between rows. Also toggled by the glyphs in the board page's bottom-right corner.", "trap tohide", gate: MinesweeperLayout.BoardGate));
             CenterMinesweeper = Config.Bind("Minesweeper", "CenterBoard", true,
