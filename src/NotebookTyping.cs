@@ -16,8 +16,8 @@ namespace InterfaceTweaks
     // as clicking a glyph in the editor's dictionary does, and Enter does that and then starts a
     // new line. Text that matches nothing is highlighted, and Tab and Enter do nothing with it.
     // Backspace deletes the last typed character, and Escape clears the text. With nothing typed,
-    // the arrow keys move the note's cursor, and Enter starts a new line, as the editor's line
-    // button does.
+    // the arrow keys move the note's cursor, Backspace and Delete remove the glyph before or
+    // after it, and Enter starts a new line, as the editor's line button does.
     internal static class NotebookTyping
     {
         private const int MaxItems = 8;
@@ -208,6 +208,23 @@ namespace InterfaceTweaks
 
         private static bool Enter => Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
 
+        // Removes the note's glyph at index, as the editor's erase button does for the glyph
+        // before the cursor, so the editor's undo button puts it back.
+        private static void Remove(Draw d, int index)
+        {
+            d.notebookpos_history.Add(d.notebook_pos);
+            d.notebook_history.Add(Global.MergeString(d.notebook));
+            d.notebook.RemoveAt(index);
+            if (index < d.notebook_pos)
+            {
+                d.notebook_pos--;
+            }
+            Global.savedata.notebook2[d.current_notebook] = Global.MergeString(d.notebook);
+            d.text_history[d.currenttext] = EditorPage + "&" + Global.MergeStringWithCursor(d.notebook, d.notebook_pos);
+            d.notebook_reposition = true;
+            d.UpdateText();
+        }
+
         private static void Clear()
         {
             query.Clear();
@@ -307,6 +324,14 @@ namespace InterfaceTweaks
                 else if (Input.GetKeyDown(KeyCode.Home))
                 {
                     MoveCursor(d, RowEnd(d.notebook, d.notebook_pos, false));
+                }
+                else if (Input.GetKeyDown(KeyCode.Backspace) && d.notebook_pos > 0)
+                {
+                    Remove(d, d.notebook_pos - 1);
+                }
+                else if (Input.GetKeyDown(KeyCode.Delete) && d.notebook_pos < d.notebook.Count)
+                {
+                    Remove(d, d.notebook_pos);
                 }
                 else if (Input.GetKeyDown(KeyCode.End))
                 {
