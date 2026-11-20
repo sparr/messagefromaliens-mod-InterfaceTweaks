@@ -44,21 +44,28 @@ namespace InterfaceTweaks
             NumberChapters = Config.Bind("Chapters", "Numbers", true,
                 Described("Put each chapter's number before its name in the chapter menus and the chapter's title, numbered as the game's chapter achievements are.", "science number"));
             QuizNumberValues = Config.Bind("Quizzes", "NumberValues", true,
-                Described("Once the game shows numbers' values in parentheses, show them for numbers typed into quiz answers too.", "riddle number", gate: Gates.Values));
+                Described("Once the game shows numbers' values in parentheses, show them for numbers typed into quiz answers too.", "riddle number", gate: Gates.Values,
+                    unlock: "translate number in riddle"));
             CombinedNumbers = Config.Bind("Numbers", "CombinedLabels", true,
-                Described("Once the game shows numbers' values in parentheses, give each number one label under all of its glyphs: its value in base 7 as its glyphs write it, then in base 10, and the unit after it with its value in human units once the game shows those. The glyphs' own labels show while the mouse is over the number.", "connect number", gate: Gates.Values));
+                Described("Once the game shows numbers' values in parentheses, give each number one label under all of its glyphs: its value in base 7 as its glyphs write it, then in base 10, and the unit after it with its value in human units once the game shows those. The glyphs' own labels show while the mouse is over the number.", "connect number", gate: Gates.Values,
+                    unlock: "connect number de translate"));
             WordUnits = Config.Bind("Numbers", "WordUnits", true,
-                Described("Where the game's text writes a number and then a unit as a separate word, give the unit the value in human units the game gives units written with their number, shown once the game shows those.", "unit word", gate: Gates.Units));
+                Described("Where the game's text writes a number and then a unit as a separate word, give the unit the value in human units the game gives units written with their number, shown once the game shows those.", "unit word", gate: Gates.Units,
+                    unlock: "translate unit word"));
             WinPages = Config.Bind("Chapters", "WinPages", true,
-                Described("At the end of each chapter's menu, list the pages the game showed in the left panel when the chapter's wins reached certain counts.", "science unlock", gate: Gates.WinPage));
+                Described("At the end of each chapter's menu, list the pages the game showed in the left panel when the chapter's wins reached certain counts.", "science unlock", gate: Gates.WinPage,
+                    unlock: "plural unlock de page in science"));
             PageNotes = Config.Bind("Notes", "PageNotes", true,
                 Described("While the left panel shows a page's explanation, the explain button opens a notes page for that page instead, with a field for English text. While a page's notes show, opening another page shows its notes.", "page draw"));
             NotebookTyping = Config.Bind("Notes", "TypeGlyphs", true,
-                Described("While the note editor shows a note, type English to list the glyphs whose translations match, Up and Down to choose one, and Tab to insert it at the cursor.", "word draw", gate: Gates.NoteEditor));
+                Described("While the note editor shows a note, type English to list the glyphs whose translations match, Up and Down to choose one, and Tab to insert it at the cursor.", "word draw", gate: Gates.NoteEditor,
+                    unlock: "write word by translate", unlockPage: "home"));
             CompactMinesweeper = Config.Bind("Minesweeper", "CompactBoard", true,
-                Described("On the minesweeper board and the solution shown after a wrong answer, hide the translations and close the gaps between rows. Also toggled by the glyphs in the board page's bottom-right corner.", "trap tohide", gate: MinesweeperLayout.BoardGate));
+                Described("On the minesweeper board and the solution shown after a wrong answer, hide the translations and close the gaps between rows. Also toggled by the glyphs in the board page's bottom-right corner.", "trap tohide", gate: MinesweeperLayout.BoardGate,
+                    unlock: "small detrap in small game"));
             CenterMinesweeper = Config.Bind("Minesweeper", "CenterBoard", true,
-                Described("Move the minesweeper board 3.5 cells right, to the middle of the right panel, and with the compact board, 1 cell down. Also toggled by the glyphs in the board page's bottom-right corner.", "trap center", gate: MinesweeperLayout.BoardGate));
+                Described("Move the minesweeper board 3.5 cells right, to the middle of the right panel, and with the compact board, 1 cell down. Also toggled by the glyphs in the board page's bottom-right corner.", "trap center", gate: MinesweeperLayout.BoardGate,
+                    unlock: "center detrap in small game"));
             UndoEnabled = Config.Bind("Undo", "Enabled", true,
                 Described("Keep a list of translation changes, and undo the latest with the undo shortcut, returning to the page it was made on. Changes made on a screen that can no longer be shown, such as before a game's turn, are dropped.", "anti translate"));
             UndoShortcut = Config.Bind("Undo", "Shortcut", new KeyboardShortcut(UnityEngine.KeyCode.Z, UnityEngine.KeyCode.LeftControl),
@@ -73,13 +80,21 @@ namespace InterfaceTweaks
 
         // Mod Settings shows a setting tagged with its name in glyphs, as game word IDs.
         // gate: a gate token for the part of the game the setting is for, as the game's menu
-        // lines start with, so Mod Settings shows the setting only once it passes.
-        private static ConfigDescription Described(string description, string glyphs, AcceptableValueBase values = null, string gate = null)
+        // lines start with, so Mod Settings shows the setting only once it passes. unlock: the
+        // feature's glyphs, from which Mod Settings writes the game's unlock sentences for the
+        // gate, in the explanation of each chapter whose quizzes the gate counts and on its win
+        // count page, or with unlockPage, in that page's explanation.
+        private static ConfigDescription Described(string description, string glyphs, AcceptableValueBase values = null,
+            string gate = null, string unlock = null, string unlockPage = null)
         {
             var tags = new Dictionary<string, string> { ["MessageFromAliens.Label"] = glyphs };
             if (gate != null)
             {
                 tags[Gates.Key] = gate;
+            }
+            if (unlock != null)
+            {
+                tags[unlockPage == null ? "MessageFromAliens.Unlock" : "MessageFromAliens.Unlock." + unlockPage] = unlock;
             }
             return new ConfigDescription(description, values, tags);
         }
