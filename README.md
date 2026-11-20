@@ -45,6 +45,8 @@ Each minesweeper tweak has a row of glyphs in the board page's bottom-right corn
 
 Each setting except `Undo.Shortcut` is tagged with its name in glyphs, and the mod names itself in glyphs, so Mod Settings can show them in the game. Mod Settings would show the shortcut as English key names in a text field, where a mistyped value would silently unbind undo.
 
+Mod Settings lists each setting once the game has unlocked what it is for, as the game decides from quiz wins, with chapters numbered as the chapter achievements are. `Quizzes.NumberValues` and `Numbers.CombinedLabels` are listed once the game can show numbers' values, after 11 quiz wins in chapter 1. `Numbers.WordUnits` is listed once the game can show any unit's value in human units, after 5 quiz wins in chapter 3, 3 in optional chapter 4, or 2 in optional chapter 5. `Chapters.WinPages` is listed once the first win page has shown, after 3 quiz wins in chapter 1. `Notes.TypeGlyphs` is listed once the note editor is unlocked, and the minesweeper settings once the minesweeper game is. The other settings are for parts of the game that are there from the start, and are always listed. The gates need a Mod Settings that reads gate tokens combining terms with `|`.
+
 ## Requirements
 
 - BepInEx 5.4.23.6 or later, `BepInEx_win_x64` build, unzipped into the game folder. Tested with Unity 6000.6.8f1.
