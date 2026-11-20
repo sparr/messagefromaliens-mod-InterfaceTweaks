@@ -6,7 +6,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 
 // The mod's name in glyphs, as game word IDs, for Mod Settings and any other mod that lists mods.
-[assembly: AssemblyMetadata("MessageFromAliens.Name", "button de small modify ness")]
+[assembly: AssemblyMetadata("MessageFromAliens.Name", "window de small modify ness")]
 
 namespace InterfaceTweaks
 {
@@ -40,7 +40,7 @@ namespace InterfaceTweaks
             ConfirmExit = Config.Bind("ExitConfirmation", "Enabled", true,
                 Described("Ask for confirmation before the home page's exit button quits the game.", "end"));
             RightAlignSettings = Config.Bind("Settings", "RightAlignChoices", true,
-                Described("On the settings page and the pages under it, line up each row's choices at the right edge instead of one cell after its name.", "right option"));
+                Described("On the settings page and the pages under it, line up each row's choices at the right edge instead of one cell after its name.", "right word"));
             NumberChapters = Config.Bind("Chapters", "Numbers", true,
                 Described("Put each chapter's number before its name in the chapter menus and the chapter's title, numbered as the game's chapter achievements are.", "science number"));
             QuizNumberValues = Config.Bind("Quizzes", "NumberValues", true,
