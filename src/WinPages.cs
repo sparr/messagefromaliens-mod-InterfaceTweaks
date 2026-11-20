@@ -24,8 +24,15 @@ namespace InterfaceTweaks
             internal int Wins;
         }
 
-        // The Global.alien_message the index was built from.
+        // The category that holds win pages, to which Mod Settings adds pages the game has no
+        // text for.
+        private const string InfoCategory = "alieninfo";
+
+        // The Global.alien_message the index was built from, and its win pages' category and
+        // that category's count of pages then.
         private static object indexed;
+        private static object indexedInfo;
+        private static int indexedInfoCount = -1;
         private static Dictionary<string, Page> pages = new Dictionary<string, Page>();
         // Win pages by the menu they are listed in, in chapter and win count order.
         private static Dictionary<string, List<Page>> menus = new Dictionary<string, List<Page>>();
@@ -57,11 +64,19 @@ namespace InterfaceTweaks
         private static void Index()
         {
             var messages = Global.alien_message;
-            if (messages == null || ReferenceEquals(messages, indexed) || Global.link_message == null)
+            if (messages == null || Global.link_message == null)
+            {
+                return;
+            }
+            messages.TryGetValue(InfoCategory, out var info);
+            var infoCount = info?.Count ?? -1;
+            if (ReferenceEquals(messages, indexed) && ReferenceEquals(info, indexedInfo) && infoCount == indexedInfoCount)
             {
                 return;
             }
             indexed = messages;
+            indexedInfo = info;
+            indexedInfoCount = infoCount;
             pages = new Dictionary<string, Page>();
             menus = new Dictionary<string, List<Page>>();
             var lastQuiz = new Dictionary<string, (int Number, string Name)>();
@@ -157,7 +172,9 @@ namespace InterfaceTweaks
                     }
                     foreach (var page in list)
                     {
-                        if (Unlocked(page))
+                        // A page has no text when Mod Settings added it and none of its lines
+                        // show.
+                        if (Unlocked(page) && !string.IsNullOrEmpty(Global.GetInfo(InfoCategory, page.Name)))
                         {
                             // Parse the name as the text files write it, as the game parses
                             // page text, so its number gets the token that shows its value.
