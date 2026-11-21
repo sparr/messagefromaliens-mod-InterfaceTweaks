@@ -68,7 +68,7 @@ namespace InterfaceTweaks
                 Described("Move the minesweeper board 3.5 cells right, to the middle of the right panel, and with the compact board, 1 cell down. Also toggled by the glyphs in the board page's bottom-right corner.", "trap center", gate: MinesweeperLayout.BoardGate,
                     unlock: "center detrap in small game"));
             Hotkeys = Config.Bind("Keys", "Shortcuts", true,
-                Described("Keyboard shortcuts for the game's own controls. In the number rule game, 1 to 7 enter digits. Page Up and Page Down go to a panel's previous and next page, both in the same panel: the panel last used when both panels have page buttons, so on its first or last page one of them does nothing.", "button"));
+                Described("Keyboard shortcuts for the game's own controls. In the number rule game, 1 to 7 enter digits. Page Up and Page Down go to a panel's previous and next page, both in the same panel: the panel last used when both panels have page buttons, so on its first or last page one of them does nothing. Tab and Shift+Tab move between translations through one panel's rows, then the other's.", "button"));
             UndoEnabled = Config.Bind("Undo", "Enabled", true,
                 Described("Keep a list of translation changes, and undo the latest with the undo shortcut, returning to the page it was made on. Changes made on a screen that can no longer be shown, such as before a game's turn, are dropped.", "anti translate"));
             UndoShortcut = Config.Bind("Undo", "Shortcut", new KeyboardShortcut(UnityEngine.KeyCode.Z, UnityEngine.KeyCode.LeftControl),
