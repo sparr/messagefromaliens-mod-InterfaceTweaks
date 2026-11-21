@@ -21,7 +21,7 @@ namespace InterfaceTweaks
     internal static class NotebookTyping
     {
         private const int MaxItems = 8;
-        private const string EditorPage = "page for write";
+        internal const string EditorPage = "page for write";
 
         private static readonly StringBuilder query = new StringBuilder();
         // Where in the typed text the next typed character goes.
@@ -45,9 +45,13 @@ namespace InterfaceTweaks
 
         // The note editor with a note open, shown in the left panel, with no text field taking the
         // keys and the calculator, which also takes typed keys, closed.
-        private static bool Active(Draw d)
+        private static bool Active(Draw d) => Plugin.NotebookTyping.Value && ShowsNote(d);
+
+        // The note editor with a note open, shown in the left panel, and the calculator, which
+        // covers the left panel and takes typed keys, closed.
+        internal static bool ShowsNote(Draw d)
         {
-            if (!Plugin.NotebookTyping.Value || d == null || d.current_page != EditorPage || string.IsNullOrEmpty(d.current_notebook))
+            if (d == null || d.current_page != EditorPage || string.IsNullOrEmpty(d.current_notebook))
             {
                 return false;
             }
