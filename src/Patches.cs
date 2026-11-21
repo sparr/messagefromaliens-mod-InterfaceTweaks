@@ -17,6 +17,7 @@ namespace InterfaceTweaks
             Hotkeys.UpdatePrefix(__instance);
             MinesweeperToggles.UpdatePrefix(__instance);
             NotebookTyping.UpdatePrefix(__instance);
+            NoteImage.UpdatePrefix(__instance);
             PageNotes.UpdatePrefix(__instance);
             UndoTranslations.UpdatePrefix(__instance);
         }
@@ -86,6 +87,7 @@ namespace InterfaceTweaks
         private static void Prefix(Draw __instance, ref string s, string sec, out Dictionary<string, string> __state)
         {
             ChapterNumbers.WritePrefix(__instance, ref s, sec, out __state);
+            NoteImage.WritePrefix(__instance, ref s, sec);
             PageNotes.WritePrefix(__instance, ref s, sec);
             QuizNumberValues.WritePrefix();
             RightAlignSettings.WritePrefix(__instance, ref s, sec);

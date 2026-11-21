@@ -398,7 +398,7 @@ namespace InterfaceTweaks
         private static void Show(Draw d)
         {
             var cam = Camera.main;
-            if (query.Length == 0 || cam == null || !Active(d) || !Cursor(d, out var top, out var bottom))
+            if (query.Length == 0 || cam == null || NoteImage.Capturing || !Active(d) || !Cursor(d, out var top, out var bottom))
             {
                 if (box != null && box.activeSelf)
                 {

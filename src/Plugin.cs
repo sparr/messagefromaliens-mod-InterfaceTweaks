@@ -19,6 +19,7 @@ namespace InterfaceTweaks
         public const string Version = "0.2.0";
 
         internal static ManualLogSource Log;
+        internal static Plugin Instance;
         internal static ConfigEntry<bool> ConfirmExit;
         internal static ConfigEntry<bool> RightAlignSettings;
         internal static ConfigEntry<bool> NumberChapters;
@@ -28,6 +29,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> WinPages;
         internal static ConfigEntry<bool> PageNotes;
         internal static ConfigEntry<bool> NotebookTyping;
+        internal static ConfigEntry<bool> NoteImageButton;
         internal static ConfigEntry<bool> CompactMinesweeper;
         internal static ConfigEntry<bool> CenterMinesweeper;
         internal static ConfigEntry<bool> Hotkeys;
@@ -38,6 +40,7 @@ namespace InterfaceTweaks
         private void Awake()
         {
             Log = Logger;
+            Instance = this;
 
             ConfirmExit = Config.Bind("ExitConfirmation", "Enabled", true,
                 Described("Ask for confirmation before the home page's exit button quits the game.", "end"));
@@ -62,6 +65,9 @@ namespace InterfaceTweaks
             NotebookTyping = Config.Bind("Notes", "TypeGlyphs", true,
                 Described("While the note editor shows a note, type English to list the glyphs whose translations match, Up and Down to choose one, and Tab to insert it at the cursor.", "word draw", gate: Gates.NoteEditor,
                     unlock: "write word by translate", unlockPage: "home"));
+            NoteImageButton = Config.Bind("Notes", "ImageButton", true,
+                Described("In the note editor, show a button at the left end of the buttons at the top right that copies an image of the whole note, every page of it, to the clipboard.", "word picture", gate: Gates.NoteEditor,
+                    unlock: "picture de write", unlockPage: "home"));
             CompactMinesweeper = Config.Bind("Minesweeper", "CompactBoard", true,
                 Described("On the minesweeper board and the solution shown after a wrong answer, hide the translations and close the gaps between rows. Also toggled by the glyphs in the board page's bottom-right corner.", "trap tohide", gate: MinesweeperLayout.BoardGate,
                     unlock: "small detrap in small game"));
