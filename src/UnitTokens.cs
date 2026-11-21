@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using HarmonyLib;
 
 namespace InterfaceTweaks
 {
@@ -189,24 +188,18 @@ namespace InterfaceTweaks
             return changed ? string.Join(" ", tokens) : s;
         }
 
-        [HarmonyPatch]
-        private static class WritePatch
+        internal static void WritePrefix(ref string s)
         {
-            private static System.Reflection.MethodBase TargetMethod() => GameText.WriteString();
-
-            private static void Prefix(ref string s)
+            try
             {
-                try
+                if (Plugin.WordUnits.Value)
                 {
-                    if (Plugin.WordUnits.Value)
-                    {
-                        s = AddTokens(s);
-                    }
+                    s = AddTokens(s);
                 }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Unit tokens failed: {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Unit tokens failed: {e}");
             }
         }
     }

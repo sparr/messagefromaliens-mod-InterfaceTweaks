@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using HarmonyLib;
 
 namespace InterfaceTweaks
 {
@@ -45,24 +44,18 @@ namespace InterfaceTweaks
             return string.Join(" ", output);
         }
 
-        [HarmonyPatch]
-        private static class WritePatch
+        internal static void WritePrefix(Draw __instance, ref string s, string sec)
         {
-            private static System.Reflection.MethodBase TargetMethod() => GameText.WriteString();
-
-            private static void Prefix(Draw __instance, ref string s, string sec)
+            try
             {
-                try
+                if (Plugin.RightAlignSettings.Value && sec == "righttextdown" && s != null && Applies(__instance))
                 {
-                    if (Plugin.RightAlignSettings.Value && sec == "righttextdown" && s != null && Applies(__instance))
-                    {
-                        s = Align(s);
-                    }
+                    s = Align(s);
                 }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Write prefix failed: {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Write prefix failed: {e}");
             }
         }
     }

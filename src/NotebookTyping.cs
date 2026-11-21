@@ -487,32 +487,28 @@ namespace InterfaceTweaks
         // Typed text and translations shown as typed, not as rich text tags.
         private static string Escape(string s) => s.Replace("<", "<noparse><</noparse>");
 
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
+        // Before the game's Update, so an insertion redraws in the same frame.
+        internal static void UpdatePrefix(Draw __instance)
         {
-            // Before the game's Update, so an insertion redraws in the same frame.
-            private static void Prefix(Draw __instance)
+            try
             {
-                try
-                {
-                    Keys(__instance);
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Notebook typing failed: {e}");
-                }
+                Keys(__instance);
             }
-
-            private static void Postfix(Draw __instance)
+            catch (Exception e)
             {
-                try
-                {
-                    Show(__instance);
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Notebook typing failed: {e}");
-                }
+                Plugin.Log.LogError($"Notebook typing failed: {e}");
+            }
+        }
+
+        internal static void UpdatePostfix(Draw __instance)
+        {
+            try
+            {
+                Show(__instance);
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Notebook typing failed: {e}");
             }
         }
     }

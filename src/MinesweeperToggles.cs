@@ -44,57 +44,48 @@ namespace InterfaceTweaks
             return Toggles().Find(t => t.Glyphs.Contains(ac));
         }
 
-        [HarmonyPatch(typeof(Draw), nameof(Draw.UpdateText1))]
-        private static class UpdateText1Patch
+        internal static void UpdateText1Postfix(Draw __instance)
         {
-            private static void Postfix(Draw __instance)
+            try
             {
-                try
+                foreach (var t in Toggles())
                 {
-                    foreach (var t in Toggles())
-                    {
-                        t.Glyphs.Clear();
-                    }
-                    if (!MinesweeperLayout.OnBoard(__instance))
-                    {
-                        return;
-                    }
-                    var width = __instance.alien_slots.GetLength(0);
-                    var row = 0;
-                    foreach (var t in Toggles())
-                    {
-                        var text = t.Name + " " + (t.Entry.Value ? OnWord : OffWord);
-                        t.Glyphs.AddRange(__instance.Write(text, 12, width, row, isLeft: false, isUp: true, showTranslation: true,
-                            __instance.text_linewidth, Sector, 1f, nospacing: true));
-                        row++;
-                    }
+                    t.Glyphs.Clear();
                 }
-                catch (Exception e)
+                if (!MinesweeperLayout.OnBoard(__instance))
                 {
-                    Plugin.Log.LogError($"Minesweeper toggles failed: {e}");
+                    return;
                 }
+                var width = __instance.alien_slots.GetLength(0);
+                var row = 0;
+                foreach (var t in Toggles())
+                {
+                    var text = t.Name + " " + (t.Entry.Value ? OnWord : OffWord);
+                    t.Glyphs.AddRange(__instance.Write(text, 12, width, row, isLeft: false, isUp: true, showTranslation: true,
+                        __instance.text_linewidth, Sector, 1f, nospacing: true));
+                    row++;
+                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Minesweeper toggles failed: {e}");
             }
         }
 
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
+        internal static void UpdatePrefix(Draw __instance)
         {
-            private static void Prefix(Draw __instance)
+            try
             {
-                try
+                if (Input.GetMouseButtonDown(0) && Under(__instance) is Toggle t)
                 {
-                    if (Input.GetMouseButtonDown(0) && Under(__instance) is Toggle t)
-                    {
-                        // Config.SettingChanged redraws the page.
-                        t.Entry.Value = !t.Entry.Value;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Minesweeper toggle failed: {e}");
+                    // Config.SettingChanged redraws the page.
+                    t.Entry.Value = !t.Entry.Value;
                 }
             }
-
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Minesweeper toggle failed: {e}");
+            }
         }
 
         // The game sets the cursor every frame, in the color of nothing clickable for the toggles;

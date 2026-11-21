@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 
 namespace InterfaceTweaks
 {
@@ -78,84 +77,78 @@ namespace InterfaceTweaks
             return string.Join(" ", tokens);
         }
 
-        [HarmonyPatch]
-        private static class WritePatch
+        internal static void WritePrefix(Draw __instance, ref string s, string sec, out Dictionary<string, string> __state)
         {
-            private static System.Reflection.MethodBase TargetMethod() => GameText.WriteString();
-
-            private static void Prefix(Draw __instance, ref string s, string sec, out Dictionary<string, string> __state)
+            __state = null;
+            try
             {
-                __state = null;
-                try
-                {
-                    if (!Plugin.NumberChapters.Value || s == null || __instance?.current_page == null)
-                    {
-                        return;
-                    }
-                    var page = __instance.current_page;
-                    if (sec == "righttextdown" && Global.link_message != null
-                        && Global.link_message.TryGetValue(page, out var chapters) && chapters != null)
-                    {
-                        var renamed = new Dictionary<string, string>();
-                        var numbered = NumberMenu(s, chapters, renamed);
-                        if (renamed.Count > 0)
-                        {
-                            s = numbered;
-                            __state = renamed;
-                        }
-                    }
-                    else if (sec == "righttitle" && (s == page || s.StartsWith(page + " ")) && PrefixFor(page, true) is string prefix)
-                    {
-                        s = string.Join(" ", Parsed(prefix)) + " " + s;
-                        __state = new Dictionary<string, string> { [prefix + " " + page] = page };
-                    }
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Write prefix failed: {e}");
-                }
-            }
-
-            // The game makes each line's link from every glyph drawn on it, so take the numbers
-            // back out of the links. The game also highlights a menu line whose page contains the
-            // marked word by looking up that link before this runs, so do that with the real name.
-            private static void Postfix(Draw __instance, string sec, List<AlienCharacter> __result, Dictionary<string, string> __state)
-            {
-                if (__state == null || __result == null)
+                if (!Plugin.NumberChapters.Value || s == null || __instance?.current_page == null)
                 {
                     return;
                 }
-                try
+                var page = __instance.current_page;
+                if (sec == "righttextdown" && Global.link_message != null
+                    && Global.link_message.TryGetValue(page, out var chapters) && chapters != null)
                 {
-                    var marked = __instance?.marked_word;
-                    List<string> sources = null;
-                    var highlight = sec == "righttextdown" && !string.IsNullOrEmpty(marked)
-                        && Global.word_source != null && Global.word_source.TryGetValue(marked, out sources) && sources != null;
-                    foreach (var ac in __result)
+                    var renamed = new Dictionary<string, string>();
+                    var numbered = NumberMenu(s, chapters, renamed);
+                    if (renamed.Count > 0)
                     {
-                        var link = ac?.line_str;
-                        if (string.IsNullOrEmpty(link))
+                        s = numbered;
+                        __state = renamed;
+                    }
+                }
+                else if (sec == "righttitle" && (s == page || s.StartsWith(page + " ")) && PrefixFor(page, true) is string prefix)
+                {
+                    s = string.Join(" ", Parsed(prefix)) + " " + s;
+                    __state = new Dictionary<string, string> { [prefix + " " + page] = page };
+                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Write prefix failed: {e}");
+            }
+        }
+
+        // The game makes each line's link from every glyph drawn on it, so take the numbers
+        // back out of the links. The game also highlights a menu line whose page contains the
+        // marked word by looking up that link before this runs, so do that with the real name.
+        internal static void WritePostfix(Draw __instance, string sec, List<AlienCharacter> __result, Dictionary<string, string> __state)
+        {
+            if (__state == null || __result == null)
+            {
+                return;
+            }
+            try
+            {
+                var marked = __instance?.marked_word;
+                List<string> sources = null;
+                var highlight = sec == "righttextdown" && !string.IsNullOrEmpty(marked)
+                    && Global.word_source != null && Global.word_source.TryGetValue(marked, out sources) && sources != null;
+                foreach (var ac in __result)
+                {
+                    var link = ac?.line_str;
+                    if (string.IsNullOrEmpty(link))
+                    {
+                        continue;
+                    }
+                    foreach (var pair in __state)
+                    {
+                        if (link == pair.Key || link.StartsWith(pair.Key + " "))
                         {
-                            continue;
-                        }
-                        foreach (var pair in __state)
-                        {
-                            if (link == pair.Key || link.StartsWith(pair.Key + " "))
+                            ac.line_str = pair.Value + link.Substring(pair.Key.Length);
+                            if (highlight && sources.Contains(ac.line_str))
                             {
-                                ac.line_str = pair.Value + link.Substring(pair.Key.Length);
-                                if (highlight && sources.Contains(ac.line_str))
-                                {
-                                    ac.Highlight(true);
-                                }
-                                break;
+                                ac.Highlight(true);
                             }
+                            break;
                         }
                     }
                 }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Write postfix failed: {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Write postfix failed: {e}");
             }
         }
     }

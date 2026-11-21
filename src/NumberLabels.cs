@@ -688,33 +688,28 @@ namespace InterfaceTweaks
             }
         }
 
-        [HarmonyPatch(typeof(Draw), nameof(Draw.UpdateText1))]
-        private static class UpdateText1Patch
+        // Before the redraw reuses the glyphs for other text.
+        internal static void UpdateText1Prefix()
         {
-            // Before the redraw reuses the glyphs for other text.
-            private static void Prefix()
+            try
             {
-                try
-                {
-                    Clear();
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Number labels failed: {e}");
-                }
+                Clear();
             }
-
-            [HarmonyPriority(Priority.Low)]
-            private static void Postfix(Draw __instance)
+            catch (Exception e)
             {
-                try
-                {
-                    Scan(__instance);
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Number labels failed: {e}");
-                }
+                Plugin.Log.LogError($"Number labels failed: {e}");
+            }
+        }
+
+        internal static void UpdateText1Postfix(Draw __instance)
+        {
+            try
+            {
+                Scan(__instance);
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Number labels failed: {e}");
             }
         }
 
@@ -741,51 +736,42 @@ namespace InterfaceTweaks
             }
         }
 
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
+        internal static void UpdatePostfix()
         {
-            private static void Postfix()
+            try
             {
-                try
-                {
-                    Tick();
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Number labels failed: {e}");
-                }
+                Tick();
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Number labels failed: {e}");
             }
         }
 
         // The game rewrites a label whenever its glyph's translation changes. After Quiz Number
         // Values adds its value.
-        [HarmonyPatch(typeof(AlienCharacter), nameof(AlienCharacter.UpdateEarthText))]
-        private static class UpdateEarthTextPatch
+        internal static void UpdateEarthTextPostfix(AlienCharacter __instance)
         {
-            [HarmonyPriority(Priority.Low)]
-            private static void Postfix(AlienCharacter __instance)
+            try
             {
-                try
+                if (numberOf.TryGetValue(__instance, out var n) && n.Combined)
                 {
-                    if (numberOf.TryGetValue(__instance, out var n) && n.Combined)
+                    if (__instance == n.Host)
                     {
-                        if (__instance == n.Host)
+                        if (!__instance.txt.isFocused)
                         {
-                            if (!__instance.txt.isFocused)
-                            {
-                                __instance.txt.text = n.Text;
-                            }
-                        }
-                        else
-                        {
-                            SetHidden(__instance, true);
+                            __instance.txt.text = n.Text;
                         }
                     }
+                    else
+                    {
+                        SetHidden(__instance, true);
+                    }
                 }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Number labels failed: {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Number labels failed: {e}");
             }
         }
 

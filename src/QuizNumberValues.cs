@@ -309,50 +309,40 @@ namespace InterfaceTweaks
             }
         }
 
-        [HarmonyPatch]
-        private static class WritePatch
+        internal static void WritePrefix() => writing = true;
+
+        // All of the page's answer slots are drawn now.
+        internal static void WritePostfix(Draw __instance, string sec)
         {
-            private static System.Reflection.MethodBase TargetMethod() => GameText.WriteString();
-
-            private static void Prefix() => writing = true;
-
-            // All of the page's answer slots are drawn now.
-            private static void Postfix(Draw __instance, string sec)
+            writing = false;
+            try
             {
-                writing = false;
-                try
+                if (sec == "righttextdown")
                 {
-                    if (sec == "righttextdown")
-                    {
-                        Annotate(__instance, null);
-                    }
+                    Annotate(__instance, null);
                 }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Quiz number values failed: {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Quiz number values failed: {e}");
             }
         }
 
         // The game rewrites a label whenever its glyph's translation changes.
-        [HarmonyPatch(typeof(AlienCharacter), nameof(AlienCharacter.UpdateEarthText))]
-        private static class UpdateEarthTextPatch
+        internal static void UpdateEarthTextPostfix(AlienCharacter __instance)
         {
-            private static void Postfix(AlienCharacter __instance)
+            try
             {
-                try
+                var d = Global.manager;
+                // Only a number's glyphs are labeled.
+                if (!writing && d?.slots != null && d.slots.Count > 0 && __instance.sector == "righttextdown" && IsNumberGlyph(__instance.alien_txt))
                 {
-                    var d = Global.manager;
-                    // Only a number's glyphs are labeled.
-                    if (!writing && d?.slots != null && d.slots.Count > 0 && __instance.sector == "righttextdown" && IsNumberGlyph(__instance.alien_txt))
-                    {
-                        Annotate(d, __instance);
-                    }
+                    Annotate(d, __instance);
                 }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Quiz number values failed: {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Quiz number values failed: {e}");
             }
         }
     }

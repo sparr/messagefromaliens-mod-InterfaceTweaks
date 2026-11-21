@@ -277,52 +277,52 @@ namespace InterfaceTweaks
             }
         }
 
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
+        internal static void UpdatePrefix(Draw __instance)
         {
-            private static void Prefix(Draw __instance)
+            try
             {
-                try
+                if (!Plugin.UndoEnabled.Value)
                 {
-                    if (!Plugin.UndoEnabled.Value)
-                    {
-                        // Copied afresh at the first save once undo is turned on again.
-                        stack.Clear();
-                        saved = null;
-                        return;
-                    }
-                    if (Plugin.UndoShortcut.Value.IsDown() && !Editing())
-                    {
-                        Undo(__instance);
-                    }
+                    // Copied afresh at the first save once undo is turned on again.
+                    stack.Clear();
+                    saved = null;
+                    return;
                 }
-                catch (Exception e)
+                if (Plugin.UndoShortcut.Value.IsDown() && !Editing())
                 {
-                    Plugin.Log.LogError($"Undo failed: {e}");
+                    Undo(__instance);
                 }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Undo failed: {e}");
             }
         }
 
-        [HarmonyPatch(typeof(Draw), nameof(Draw.UpdateText1))]
-        private static class UpdateText1Patch
+        internal static void UpdateText1Prefix(Draw __instance)
         {
-            private static void Prefix(Draw __instance) => dictFreePage = (bool)DictFreePage.GetValue(__instance);
-
-            // Last, so the fingerprint includes what other mods draw.
-            [HarmonyPriority(Priority.Last)]
-            private static void Postfix(Draw __instance)
+            try
             {
-                try
+                dictFreePage = (bool)DictFreePage.GetValue(__instance);
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Undo failed: {e}");
+            }
+        }
+
+        internal static void UpdateText1Postfix(Draw __instance)
+        {
+            try
+            {
+                if (Plugin.UndoEnabled.Value)
                 {
-                    if (Plugin.UndoEnabled.Value)
-                    {
-                        lastScreen = Capture(__instance);
-                    }
+                    lastScreen = Capture(__instance);
                 }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Undo capture failed: {e}");
-                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Undo capture failed: {e}");
             }
         }
 

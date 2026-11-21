@@ -147,39 +147,35 @@ namespace InterfaceTweaks
             moved.Clear();
         }
 
-        [HarmonyPatch(typeof(Draw), nameof(Draw.UpdateText1))]
-        private static class UpdateText1Patch
+        internal static void UpdateText1Prefix()
         {
-            private static void Prefix()
+            try
             {
-                try
+                Restore();
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Minesweeper layout restore failed: {e}");
+            }
+        }
+
+        internal static void UpdateText1Postfix(Draw __instance)
+        {
+            try
+            {
+                if (Plugin.CompactMinesweeper.Value && ShowsSolution(__instance))
                 {
-                    Restore();
+                    Move(__instance.alien_left_text, true, Vector3.zero);
                 }
-                catch (Exception e)
+                if (OnBoard(__instance))
                 {
-                    Plugin.Log.LogError($"Minesweeper layout restore failed: {e}");
+                    Move(__instance.alien_right_text_down, Plugin.CompactMinesweeper.Value, Offset(__instance));
+                    MoveFrames(__instance, Plugin.CompactMinesweeper.Value, Offset(__instance));
                 }
             }
-
-            private static void Postfix(Draw __instance)
+            catch (Exception e)
             {
-                try
-                {
-                    if (Plugin.CompactMinesweeper.Value && ShowsSolution(__instance))
-                    {
-                        Move(__instance.alien_left_text, true, Vector3.zero);
-                    }
-                    if (OnBoard(__instance))
-                    {
-                        Move(__instance.alien_right_text_down, Plugin.CompactMinesweeper.Value, Offset(__instance));
-                        MoveFrames(__instance, Plugin.CompactMinesweeper.Value, Offset(__instance));
-                    }
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Minesweeper layout failed: {e}");
-                }
+                Plugin.Log.LogError($"Minesweeper layout failed: {e}");
             }
         }
 
@@ -187,17 +183,9 @@ namespace InterfaceTweaks
         // every other mod's postfix, which may read the mouse for their own purposes.
         private static bool inGameUpdate;
 
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
-        {
-            [HarmonyPriority(Priority.Last)]
-            private static void Prefix() => inGameUpdate = true;
+        internal static void GameUpdateStarts() => inGameUpdate = true;
 
-            [HarmonyPriority(Priority.First)]
-            private static void Postfix() => inGameUpdate = false;
-
-            private static void Finalizer() => inGameUpdate = false;
-        }
+        internal static void GameUpdateEnds() => inGameUpdate = false;
 
         // Draw.Update tests the mouse against the board's cells, where the game draws them, with the
         // world point from Camera.ScreenToWorldPoint. Its raycasts for the glyph under the mouse

@@ -184,44 +184,40 @@ namespace InterfaceTweaks
         private static string Line(string name) => " " + ChapterNumbers.Newline + " " + string.Join(" ", Global.StringToListString(name));
 
         // Adds the unlocked win pages to the end of the menu's lines.
-        [HarmonyPatch(typeof(Global), nameof(Global.GetInfo))]
-        private static class GetInfoPatch
+        internal static void GetInfoPostfix(string s, ref string __result)
         {
-            private static void Postfix(string s, ref string __result)
+            try
             {
-                try
+                if (!Plugin.WinPages.Value || string.IsNullOrEmpty(__result) || s == null)
                 {
-                    if (!Plugin.WinPages.Value || string.IsNullOrEmpty(__result) || s == null)
-                    {
-                        return;
-                    }
-                    Index();
-                    var add = "";
-                    foreach (var page in menus.TryGetValue(s, out var list) ? list : Enumerable.Empty<Page>())
-                    {
-                        // A page has no text when Mod Settings added it and none of its lines
-                        // show.
-                        if (Unlocked(page) && !string.IsNullOrEmpty(Global.GetInfo(InfoCategory, page.Name)))
-                        {
-                            // Parse the name as the text files write it, as the game parses
-                            // page text, so its number gets the token that shows its value.
-                            add += Line(page.Chapter + " " + Unlock + " " + page.Wins);
-                        }
-                    }
-                    foreach (var name in termMenus.TryGetValue(s, out var names) ? names : Enumerable.Empty<string>())
-                    {
-                        // It has text while Mod Settings shows one of its lines.
-                        if (!string.IsNullOrEmpty(Global.GetInfo(InfoCategory, name)))
-                        {
-                            add += Line(name);
-                        }
-                    }
-                    __result += add;
+                    return;
                 }
-                catch (Exception e)
+                Index();
+                var add = "";
+                foreach (var page in menus.TryGetValue(s, out var list) ? list : Enumerable.Empty<Page>())
                 {
-                    Plugin.Log.LogError($"Win pages: {e}");
+                    // A page has no text when Mod Settings added it and none of its lines
+                    // show.
+                    if (Unlocked(page) && !string.IsNullOrEmpty(Global.GetInfo(InfoCategory, page.Name)))
+                    {
+                        // Parse the name as the text files write it, as the game parses
+                        // page text, so its number gets the token that shows its value.
+                        add += Line(page.Chapter + " " + Unlock + " " + page.Wins);
+                    }
                 }
+                foreach (var name in termMenus.TryGetValue(s, out var names) ? names : Enumerable.Empty<string>())
+                {
+                    // It has text while Mod Settings shows one of its lines.
+                    if (!string.IsNullOrEmpty(Global.GetInfo(InfoCategory, name)))
+                    {
+                        add += Line(name);
+                    }
+                }
+                __result += add;
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Win pages: {e}");
             }
         }
 

@@ -181,44 +181,40 @@ namespace InterfaceTweaks
             lastEntry = entry;
         }
 
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
+        internal static void UpdatePrefix(Draw __instance)
         {
-            private static void Prefix(Draw __instance)
+            try
             {
-                try
+                NoteLeftChange(__instance);
+                if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
                 {
-                    NoteLeftChange(__instance);
-                    if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
-                    {
-                        lastClickLeft = Input.mousePosition.x < Screen.width / 2f;
-                    }
-                    var focused = TextFieldFocused();
-                    var blocked = focused || focusedLastFrame;
-                    focusedLastFrame = focused;
-                    if (!Plugin.Hotkeys.Value || blocked || __instance == null)
-                    {
-                        return;
-                    }
-                    if (Input.GetKeyDown(KeyCode.PageUp))
-                    {
-                        Page(__instance, false);
-                    }
-                    else if (Input.GetKeyDown(KeyCode.PageDown))
-                    {
-                        Page(__instance, true);
-                    }
-                    var digit = DigitPressed();
-                    if (digit != 0 && __instance.current_page == RulePage && RuleLevel(__instance) != 0
-                        && RuleTest(__instance) == 0 && !CalculatorIsOpen())
-                    {
-                        EnterDigit(__instance, digit);
-                    }
+                    lastClickLeft = Input.mousePosition.x < Screen.width / 2f;
                 }
-                catch (Exception e)
+                var focused = TextFieldFocused();
+                var blocked = focused || focusedLastFrame;
+                focusedLastFrame = focused;
+                if (!Plugin.Hotkeys.Value || blocked || __instance == null)
                 {
-                    Plugin.Log.LogError($"Hotkeys failed: {e}");
+                    return;
                 }
+                if (Input.GetKeyDown(KeyCode.PageUp))
+                {
+                    Page(__instance, false);
+                }
+                else if (Input.GetKeyDown(KeyCode.PageDown))
+                {
+                    Page(__instance, true);
+                }
+                var digit = DigitPressed();
+                if (digit != 0 && __instance.current_page == RulePage && RuleLevel(__instance) != 0
+                    && RuleTest(__instance) == 0 && !CalculatorIsOpen())
+                {
+                    EnterDigit(__instance, digit);
+                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Hotkeys failed: {e}");
             }
         }
     }

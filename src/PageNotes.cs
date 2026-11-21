@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -341,94 +340,80 @@ namespace InterfaceTweaks
             }
         }
 
-        [HarmonyPatch(typeof(Draw), nameof(Draw.UpdateText1))]
-        private static class UpdateText1Patch
+        internal static void UpdateText1Prefix(Draw __instance)
         {
-            private static void Prefix(Draw __instance)
+            try
             {
-                try
+                if (Enabled)
                 {
-                    if (Enabled)
-                    {
-                        Follow(__instance);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogError($"Page notes failed: {e}");
+                    Follow(__instance);
                 }
             }
-
-            private static void Postfix() => dirty = true;
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Page notes failed: {e}");
+            }
         }
+
+        internal static void UpdateText1Postfix() => dirty = true;
 
         // The right menu's explain button becomes the notes button while the left panel shows
         // the explanation.
-        [HarmonyPatch]
-        private static class WritePatch
+        internal static void WritePrefix(Draw __instance, ref string s, string sec)
         {
-            private static System.Reflection.MethodBase TargetMethod() => GameText.WriteString();
-
-            private static void Prefix(Draw __instance, ref string s, string sec)
+            try
             {
-                try
+                if (sec != "rightmenu" || s == null)
                 {
-                    if (sec != "rightmenu" || s == null)
-                    {
-                        return;
-                    }
-                    buttonShown = false;
-                    if (!Enabled || !ShowsHelp(__instance))
-                    {
-                        return;
-                    }
-                    var tokens = s.Split(' ');
-                    var i = Array.IndexOf(tokens, ExplainButton);
-                    if (i >= 0)
-                    {
-                        tokens[i] = NotesButton;
-                        s = string.Join(" ", tokens);
-                        buttonShown = true;
-                    }
+                    return;
                 }
-                catch (Exception e)
+                buttonShown = false;
+                if (!Enabled || !ShowsHelp(__instance))
                 {
-                    Plugin.Log.LogError($"Page notes button failed: {e}");
+                    return;
                 }
+                var tokens = s.Split(' ');
+                var i = Array.IndexOf(tokens, ExplainButton);
+                if (i >= 0)
+                {
+                    tokens[i] = NotesButton;
+                    s = string.Join(" ", tokens);
+                    buttonShown = true;
+                }
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Page notes button failed: {e}");
             }
         }
 
         // A left click on the notes button opens the page's notes. The game's own click handling
         // does nothing for that glyph in the right menu.
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
+        internal static void UpdatePrefix(Draw __instance)
         {
-            private static void Prefix(Draw __instance)
+            try
             {
-                try
+                if (!buttonShown || !Enabled || !Input.GetMouseButtonDown(0))
                 {
-                    if (!buttonShown || !Enabled || !Input.GetMouseButtonDown(0))
-                    {
-                        return;
-                    }
-                    var cam = Camera.main;
-                    if (cam == null || !Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out var hit))
-                    {
-                        return;
-                    }
-                    var ac = hit.transform.GetComponentInParent<AlienCharacter>();
-                    if (ac != null && ac.sector == "rightmenu" && ac.alien_txt == NotesButton)
-                    {
-                        Open(__instance);
-                    }
+                    return;
                 }
-                catch (Exception e)
+                var cam = Camera.main;
+                if (cam == null || !Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out var hit))
                 {
-                    Plugin.Log.LogError($"Page notes click failed: {e}");
+                    return;
+                }
+                var ac = hit.transform.GetComponentInParent<AlienCharacter>();
+                if (ac != null && ac.sector == "rightmenu" && ac.alien_txt == NotesButton)
+                {
+                    Open(__instance);
                 }
             }
-
-            private static void Postfix() => Tick();
+            catch (Exception e)
+            {
+                Plugin.Log.LogError($"Page notes click failed: {e}");
+            }
         }
+
+        internal static void UpdatePostfix() => Tick();
     }
 }

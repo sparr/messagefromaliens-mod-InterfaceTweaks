@@ -96,27 +96,23 @@ namespace InterfaceTweaks
         }
 
         // The game reads a page's lines, and its explanation, from its text files by page name.
-        [HarmonyPatch(typeof(Global), nameof(Global.GetInfo))]
-        private static class GetInfoPatch
+        internal static bool GetInfoPrefix(string category, string s, ref string __result)
         {
-            private static bool Prefix(string category, string s, ref string __result)
+            if (page == null || category != "alieninfo" || !IsOpen(Global.manager))
             {
-                if (page == null || category != "alieninfo" || !IsOpen(Global.manager))
-                {
-                    return true;
-                }
-                if (s == page)
-                {
-                    __result = Lines;
-                    return false;
-                }
-                if (s == page + TutorialSuffix)
-                {
-                    __result = Tutorial;
-                    return false;
-                }
                 return true;
             }
+            if (s == page)
+            {
+                __result = Lines;
+                return false;
+            }
+            if (s == page + TutorialSuffix)
+            {
+                __result = Tutorial;
+                return false;
+            }
+            return true;
         }
     }
 }

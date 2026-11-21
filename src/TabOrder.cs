@@ -115,28 +115,24 @@ namespace InterfaceTweaks
             es.SetSelectedGameObject(best ?? wrap);
         }
 
-        [HarmonyPatch(typeof(Draw), "Update")]
-        private static class UpdatePatch
+        internal static IEnumerable<CodeInstruction> UpdateTranspiler(IEnumerable<CodeInstruction> instructions)
         {
-            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            var getKeyDown = AccessTools.Method(typeof(Input), nameof(Input.GetKeyDown), new[] { typeof(KeyCode) });
+            var replacement = AccessTools.Method(typeof(TabOrder), nameof(GameGetKeyDown));
+            var found = 0;
+            foreach (var ins in instructions)
             {
-                var getKeyDown = AccessTools.Method(typeof(Input), nameof(Input.GetKeyDown), new[] { typeof(KeyCode) });
-                var replacement = AccessTools.Method(typeof(TabOrder), nameof(GameGetKeyDown));
-                var found = 0;
-                foreach (var ins in instructions)
+                if (ins.Calls(getKeyDown))
                 {
-                    if (ins.Calls(getKeyDown))
-                    {
-                        found++;
-                        ins.opcode = OpCodes.Call;
-                        ins.operand = replacement;
-                    }
-                    yield return ins;
+                    found++;
+                    ins.opcode = OpCodes.Call;
+                    ins.operand = replacement;
                 }
-                if (found != 1)
-                {
-                    Plugin.Log.LogWarning($"Tab order: expected 1 Input.GetKeyDown call in Draw.Update, found {found}");
-                }
+                yield return ins;
+            }
+            if (found != 1)
+            {
+                Plugin.Log.LogWarning($"Tab order: expected 1 Input.GetKeyDown call in Draw.Update, found {found}");
             }
         }
     }
