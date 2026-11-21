@@ -64,7 +64,7 @@ Each gated setting also declares its feature's words in glyphs, from which Mod S
 dotnet build -c Release
 ```
 
-The build copies `InterfaceTweaks.dll` to `<game>/BepInEx/plugins/InterfaceTweaks/`. Disable the copy with `-p:DeployToGame=false`.
+With `-p:DeployToGame=true`, the build also copies `InterfaceTweaks.dll` to `<game>/BepInEx/plugins/InterfaceTweaks/`.
 
 The build looks for the game in `<SteamLibraryDir>/steamapps/common/Message From Aliens`. `SteamLibraryDir` comes from the first of these that is set:
 
