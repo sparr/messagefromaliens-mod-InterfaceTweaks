@@ -31,6 +31,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> CompactMinesweeper;
         internal static ConfigEntry<bool> CenterMinesweeper;
         internal static ConfigEntry<bool> Hotkeys;
+        internal static ConfigEntry<bool> SkipDuplicateHistory;
         internal static ConfigEntry<bool> UndoEnabled;
         internal static ConfigEntry<KeyboardShortcut> UndoShortcut;
 
@@ -69,6 +70,8 @@ namespace InterfaceTweaks
                     unlock: "center detrap in small game"));
             Hotkeys = Config.Bind("Keys", "Shortcuts", true,
                 Described("Keyboard shortcuts for the game's own controls. In the number rule game, 1 to 7 enter digits. Page Up and Page Down go to a panel's previous and next page, both in the same panel: the panel last used when both panels have page buttons, so on its first or last page one of them does nothing. Tab and Shift+Tab move between translations through one panel's rows, then the other's.", "button"));
+            SkipDuplicateHistory = Config.Bind("History", "SkipDuplicates", true,
+                Described("Don't add a left panel history entry that is the same as the one it shows, as the game adds when a glyph is right-clicked twice.", "no again"));
             UndoEnabled = Config.Bind("Undo", "Enabled", true,
                 Described("Keep a list of translation changes, and undo the latest with the undo shortcut, returning to the page it was made on. Changes made on a screen that can no longer be shown, such as before a game's turn, are dropped.", "anti translate"));
             UndoShortcut = Config.Bind("Undo", "Shortcut", new KeyboardShortcut(UnityEngine.KeyCode.Z, UnityEngine.KeyCode.LeftControl),
