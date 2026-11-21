@@ -9,7 +9,9 @@ namespace InterfaceTweaks
     // When a chapter's wins reach certain counts, the game shows a page for that count in the left
     // panel. No menu links to those pages, so once the left panel's history is gone they cannot be
     // seen again. This lists each one the player has unlocked at the end of the menu that holds
-    // the chapter's last quiz, where it opens on the right like the menu's other pages.
+    // the chapter's last quiz, where it opens on the right like the menu's other pages. Pages that
+    // Mod Settings adds for unlock messages gated on a page follow, at the end of the menu that
+    // holds that page, while one of their lines shows.
     internal static class WinPages
     {
         // A win page is named for its chapter, this word, and the win count that shows it.
@@ -36,6 +38,10 @@ namespace InterfaceTweaks
         private static Dictionary<string, Page> pages = new Dictionary<string, Page>();
         // Win pages by the menu they are listed in, in chapter and win count order.
         private static Dictionary<string, List<Page>> menus = new Dictionary<string, List<Page>>();
+        // Pages Mod Settings adds for unlock messages gated on a page, named for that page and
+        // Unlock with no count, by the menu that holds the page. Mod Settings decides when they
+        // count as won.
+        private static Dictionary<string, List<string>> termMenus = new Dictionary<string, List<string>>();
 
         // Page names hold numbers as the game parses them: a digit, or a digit at a place, as 1e1
         // for 7, so 11 is "1e1 4".
@@ -79,6 +85,7 @@ namespace InterfaceTweaks
             indexedInfoCount = infoCount;
             pages = new Dictionary<string, Page>();
             menus = new Dictionary<string, List<Page>>();
+            termMenus = new Dictionary<string, List<string>>();
             var lastQuiz = new Dictionary<string, (int Number, string Name)>();
             foreach (var category in messages.Values)
             {
@@ -133,10 +140,31 @@ namespace InterfaceTweaks
                 list.Add(page);
                 listed++;
             }
-            Plugin.Log.LogInfo($"Win pages: {pages.Count} found, {listed} listed in {menus.Count} menus");
+            var termPages = 0;
+            var termSuffix = " " + Unlock;
+            foreach (var name in info?.Keys ?? Enumerable.Empty<string>())
+            {
+                if (!name.EndsWith(termSuffix, StringComparison.Ordinal) || name.Length == termSuffix.Length)
+                {
+                    continue;
+                }
+                termPages++;
+                if (!menuOf.TryGetValue(name.Substring(0, name.Length - termSuffix.Length).Trim(), out var menu))
+                {
+                    unlisted++;
+                    continue;
+                }
+                if (!termMenus.TryGetValue(menu, out var list))
+                {
+                    termMenus[menu] = list = new List<string>();
+                }
+                list.Add(name);
+                listed++;
+            }
+            Plugin.Log.LogInfo($"Win pages: {pages.Count} count pages and {termPages} page term pages found, {listed} listed");
             if (unlisted > 0)
             {
-                Plugin.Log.LogWarning($"Win pages: {unlisted} have no menu that holds their chapter's last quiz");
+                Plugin.Log.LogWarning($"Win pages: {unlisted} have no menu that holds their chapter's last quiz or their page");
             }
         }
 
@@ -153,6 +181,8 @@ namespace InterfaceTweaks
             return pages.TryGetValue(name, out var page) ? page : null;
         }
 
+        private static string Line(string name) => " " + ChapterNumbers.Newline + " " + string.Join(" ", Global.StringToListString(name));
+
         // Adds the unlocked win pages to the end of the menu's lines.
         [HarmonyPatch(typeof(Global), nameof(Global.GetInfo))]
         private static class GetInfoPatch
@@ -166,11 +196,8 @@ namespace InterfaceTweaks
                         return;
                     }
                     Index();
-                    if (!menus.TryGetValue(s, out var list))
-                    {
-                        return;
-                    }
-                    foreach (var page in list)
+                    var add = "";
+                    foreach (var page in menus.TryGetValue(s, out var list) ? list : Enumerable.Empty<Page>())
                     {
                         // A page has no text when Mod Settings added it and none of its lines
                         // show.
@@ -178,10 +205,18 @@ namespace InterfaceTweaks
                         {
                             // Parse the name as the text files write it, as the game parses
                             // page text, so its number gets the token that shows its value.
-                            var line = string.Join(" ", Global.StringToListString(page.Chapter + " " + Unlock + " " + page.Wins));
-                            __result += " " + ChapterNumbers.Newline + " " + line;
+                            add += Line(page.Chapter + " " + Unlock + " " + page.Wins);
                         }
                     }
+                    foreach (var name in termMenus.TryGetValue(s, out var names) ? names : Enumerable.Empty<string>())
+                    {
+                        // It has text while Mod Settings shows one of its lines.
+                        if (!string.IsNullOrEmpty(Global.GetInfo(InfoCategory, name)))
+                        {
+                            add += Line(name);
+                        }
+                    }
+                    __result += add;
                 }
                 catch (Exception e)
                 {
