@@ -24,6 +24,8 @@ namespace InterfaceTweaks
             internal string Name;
             internal string Chapter;
             internal int Wins;
+            // Its menu line, parsed once.
+            internal string Line;
         }
 
         // The category that holds win pages, to which Mod Settings adds pages the game has no
@@ -42,6 +44,14 @@ namespace InterfaceTweaks
         // Unlock with no count, by the menu that holds the page. Mod Settings decides when they
         // count as won.
         private static Dictionary<string, List<string>> termMenus = new Dictionary<string, List<string>>();
+        // The menu lines of those pages, parsed once.
+        private static Dictionary<string, string> termLines = new Dictionary<string, string>();
+
+        // Chapters' win counts, and the win list and its size when they were counted. The game
+        // only adds to the list, and loading a save replaces it, so either change means a recount.
+        private static readonly Dictionary<string, int> winCounts = new Dictionary<string, int>();
+        private static object countedWins;
+        private static int countedWinsSize = -1;
 
         // Page names hold numbers as the game parses them: a digit, or a digit at a place, as 1e1
         // for 7, so 11 is "1e1 4".
@@ -86,6 +96,7 @@ namespace InterfaceTweaks
             pages = new Dictionary<string, Page>();
             menus = new Dictionary<string, List<Page>>();
             termMenus = new Dictionary<string, List<string>>();
+            termLines = new Dictionary<string, string>();
             var lastQuiz = new Dictionary<string, (int Number, string Name)>();
             foreach (var category in messages.Values)
             {
@@ -169,7 +180,23 @@ namespace InterfaceTweaks
         }
 
         // The game shows a chapter's win page when the chapter's count of wins reaches the page's.
-        private static bool Unlocked(Page page) => Global.savedata?.win != null && Global.CountWin(page.Chapter) >= page.Wins;
+        private static bool Unlocked(Page page) => Global.savedata?.win != null && Wins(page.Chapter) >= page.Wins;
+
+        private static int Wins(string chapter)
+        {
+            var win = Global.savedata.win;
+            if (!ReferenceEquals(win, countedWins) || win.Count != countedWinsSize)
+            {
+                winCounts.Clear();
+                countedWins = win;
+                countedWinsSize = win.Count;
+            }
+            if (!winCounts.TryGetValue(chapter, out var count))
+            {
+                winCounts[chapter] = count = Global.CountWin(chapter);
+            }
+            return count;
+        }
 
         private static Page Find(string name)
         {
@@ -202,7 +229,7 @@ namespace InterfaceTweaks
                     {
                         // Parse the name as the text files write it, as the game parses
                         // page text, so its number gets the token that shows its value.
-                        add += Line(page.Chapter + " " + Unlock + " " + page.Wins);
+                        add += page.Line ??= Line(page.Chapter + " " + Unlock + " " + page.Wins);
                     }
                 }
                 foreach (var name in termMenus.TryGetValue(s, out var names) ? names : Enumerable.Empty<string>())
@@ -210,7 +237,11 @@ namespace InterfaceTweaks
                     // It has text while Mod Settings shows one of its lines.
                     if (!string.IsNullOrEmpty(Global.GetInfo(InfoCategory, name)))
                     {
-                        add += Line(name);
+                        if (!termLines.TryGetValue(name, out var line))
+                        {
+                            termLines[name] = line = Line(name);
+                        }
+                        add += line;
                     }
                 }
                 __result += add;
