@@ -49,16 +49,23 @@ namespace InterfaceTweaks
             internal long Filter;
         }
 
-        // Draw fields that say which page each panel shows, and where in it.
-        private static readonly FieldInfo[] NavigationFields = new[]
-        {
-            "current_page", "parent_page", "parent_index", "currentrightpage", "currentrightpageup",
-            "prev_page", "current_category", "current_categoryname", "dict_free_page",
-            "selected_character", "hide_unknown_word_indict", "current_notebook", "notebook_pos",
-        }.Select(name => AccessTools.Field(typeof(Draw), name) ?? throw new MissingFieldException(nameof(Draw), name)).ToArray();
+        // The public fields are named with nameof, so that a game update that renames one fails
+        // the build; the private ones by their names, failing at startup.
+        private static FieldInfo Field(string name) =>
+            AccessTools.Field(typeof(Draw), name) ?? throw new MissingFieldException(nameof(Draw), name);
 
-        private static readonly FieldInfo DictFreePage = AccessTools.Field(typeof(Draw), "dict_free_page");
-        private static readonly FieldInfo TextToUpdate = AccessTools.Field(typeof(Draw), "text_to_update");
+        private static readonly FieldInfo DictFreePage = Field("dict_free_page");
+        private static readonly FieldInfo TextToUpdate = Field("text_to_update");
+
+        // Draw fields that say which page each panel shows, and where in it.
+        private static readonly FieldInfo[] NavigationFields =
+        {
+            Field(nameof(Draw.current_page)), Field(nameof(Draw.parent_page)), Field(nameof(Draw.parent_index)),
+            Field(nameof(Draw.currentrightpage)), Field(nameof(Draw.currentrightpageup)), Field("prev_page"),
+            Field(nameof(Draw.current_category)), Field("current_categoryname"), DictFreePage,
+            Field("selected_character"), Field(nameof(Draw.hide_unknown_word_indict)),
+            Field(nameof(Draw.current_notebook)), Field(nameof(Draw.notebook_pos)),
+        };
         // dict_free_page as the redraw began: the redraw itself sets it false.
         private static bool dictFreePage;
         // Set while an undo writes and redraws, whose saves are not new changes.
