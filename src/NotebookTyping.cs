@@ -33,9 +33,6 @@ namespace InterfaceTweaks
         private static TextMeshProUGUI text;
         private static Image background;
 
-        private static readonly Type CalculatorPanel = AccessTools.TypeByName("Calculator.Panel");
-        private static readonly System.Reflection.FieldInfo CalculatorOpen = CalculatorPanel == null ? null : AccessTools.Field(CalculatorPanel, "open");
-
         private static bool TextFieldFocused()
         {
             var selected = EventSystem.current?.currentSelectedGameObject;
@@ -60,7 +57,7 @@ namespace InterfaceTweaks
             {
                 return false;
             }
-            return !(CalculatorOpen != null && (bool)CalculatorOpen.GetValue(null));
+            return !CalculatorState.IsOpen();
         }
 
         private static void Search()

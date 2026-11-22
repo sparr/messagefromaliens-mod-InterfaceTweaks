@@ -35,9 +35,6 @@ namespace InterfaceTweaks
         private static readonly AccessTools.FieldRef<Draw, bool> DictFreePage = AccessTools.FieldRefAccess<Draw, bool>("dict_free_page");
         private static readonly Func<Draw, bool> IsEditNote = AccessTools.MethodDelegate<Func<Draw, bool>>(AccessTools.Method(typeof(Draw), "IsEditNote"));
 
-        private static readonly Type CalculatorPanel = AccessTools.TypeByName("Calculator.Panel");
-        private static readonly System.Reflection.FieldInfo CalculatorOpen = CalculatorPanel == null ? null : AccessTools.Field(CalculatorPanel, "open");
-
         private static bool lastClickLeft;
         // The left panel's message as of the last frame: its place in the history, the history's
         // length, and its entry.
@@ -52,8 +49,6 @@ namespace InterfaceTweaks
             return selected != null && (selected.GetComponent<TMP_InputField>()?.isFocused == true
                 || selected.GetComponent<InputField>()?.isFocused == true);
         }
-
-        private static bool CalculatorIsOpen() => CalculatorOpen != null && (bool)CalculatorOpen.GetValue(null);
 
         // The digit of a 1 to 7 key pressed this frame, on the number row or the keypad, or 0.
         private static int DigitPressed()
@@ -207,7 +202,7 @@ namespace InterfaceTweaks
                 }
                 var digit = DigitPressed();
                 if (digit != 0 && __instance.current_page == RulePage && RuleLevel(__instance) != 0
-                    && RuleTest(__instance) == 0 && !CalculatorIsOpen())
+                    && RuleTest(__instance) == 0 && !CalculatorState.IsOpen())
                 {
                     EnterDigit(__instance, digit);
                 }
