@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -41,7 +40,7 @@ namespace InterfaceTweaks
             internal List<string> TextHistory;
             internal List<int> LeftPages;
             internal int CurrentText;
-            internal string Fingerprint;
+            internal ulong Fingerprint;
             // The note open in the note editor, and its text as the game saved it, which the game
             // replaces with a new string on each edit of the note. Both null when no note is open.
             internal string NoteName;
@@ -133,9 +132,9 @@ namespace InterfaceTweaks
         // it. So are the right panel's menu, whose bookmark glyph undo does not restore, the
         // lines drawn around cells, which the minesweeper toggles move, and the raw page text,
         // which marks won lines.
-        private static string Fingerprint(Draw d)
+        private static ulong Fingerprint(Draw d)
         {
-            var sb = new StringBuilder();
+            var hash = FnvOffset;
             if (d.alien_slots != null)
             {
                 for (var x = 0; x < d.alien_slots.GetLength(0); x++)
@@ -145,13 +144,45 @@ namespace InterfaceTweaks
                         var ac = d.alien_slots[x, y];
                         if (ac != null && ac.gameObject.activeInHierarchy && ac.sector != null && ac.sector.StartsWith("right") && ac.sector != "rightmenu")
                         {
-                            sb.Append(x).Append(',').Append(y).Append(' ').Append(ac.alien_txt).Append(' ')
-                                .Append(ac.extra_info).Append('\n');
+                            hash = Hash(hash, x);
+                            hash = Hash(hash, y);
+                            hash = Hash(hash, ac.alien_txt);
+                            hash = Hash(hash, ac.extra_info);
                         }
                     }
                 }
             }
-            return sb.ToString();
+            return hash;
+        }
+
+        // 64-bit FNV-1a.
+        private const ulong FnvOffset = 14695981039346656037;
+        private const ulong FnvPrime = 1099511628211;
+
+        private static ulong Hash(ulong hash, int value)
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                hash = (hash ^ (byte)(value >> (8 * i))) * FnvPrime;
+            }
+            return hash;
+        }
+
+        // The length first, so that adjacent strings can't run together. Null hashes apart
+        // from "".
+        private static ulong Hash(ulong hash, string value)
+        {
+            if (value == null)
+            {
+                return Hash(hash, -1);
+            }
+            hash = Hash(hash, value.Length);
+            foreach (var c in value)
+            {
+                hash = (hash ^ (byte)c) * FnvPrime;
+                hash = (hash ^ (byte)(c >> 8)) * FnvPrime;
+            }
+            return hash;
         }
 
         // keepForward: keep the left panel's later pages if its history still begins with the
