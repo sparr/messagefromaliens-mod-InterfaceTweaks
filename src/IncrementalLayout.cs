@@ -14,8 +14,6 @@ namespace InterfaceTweaks
     {
         internal const string Page = "money enlarge";
         internal const string Gate = "[geometry-riddle-3]";
-        private const string Gap = ".";
-        private const string Newline = "newline";
         private const string MoneyWord = "money";
         private const string PriceWord = "price";
         // Zero-based cells where the time and the price glyph start.
@@ -29,7 +27,7 @@ namespace InterfaceTweaks
 
         private static int Cells(IEnumerable<string> tokens) => tokens.Count(GameText.TakesCell);
 
-        private static IEnumerable<string> Gaps(int n) => Enumerable.Repeat(Gap, Math.Max(0, n));
+        private static IEnumerable<string> Gaps(int n) => Enumerable.Repeat(GameText.Gap, Math.Max(0, n));
 
         // The money row: the amount's tokens, the money glyph, an optional gap, and the time's
         // tokens ending in its unit.
@@ -41,7 +39,7 @@ namespace InterfaceTweaks
                 return null;
             }
             var amount = row.GetRange(0, money);
-            var time = row.Skip(money + 1).SkipWhile(t => t == Gap).ToList();
+            var time = row.Skip(money + 1).SkipWhile(t => t == GameText.Gap).ToList();
             if (time.Count == 0)
             {
                 return null;
@@ -57,12 +55,12 @@ namespace InterfaceTweaks
         // the price glyph.
         private static List<string> BuildingRow(List<string> row)
         {
-            var gap = row.IndexOf(Gap);
+            var gap = row.IndexOf(GameText.Gap);
             if (gap < 2 || row[row.Count - 1] != PriceWord || !Buildings.Contains(row[gap - 1].TrimStart('?')))
             {
                 return null;
             }
-            var price = row.GetRange(gap + 1, row.Count - gap - 2).SkipWhile(t => t == Gap).ToList();
+            var price = row.GetRange(gap + 1, row.Count - gap - 2).SkipWhile(t => t == GameText.Gap).ToList();
             if (price.Count == 0)
             {
                 return null;
@@ -82,7 +80,7 @@ namespace InterfaceTweaks
             var start = 0;
             for (var i = 0; i <= tokens.Count; i++)
             {
-                if (i < tokens.Count && tokens[i] != Newline)
+                if (i < tokens.Count && tokens[i] != GameText.Newline)
                 {
                     continue;
                 }
@@ -90,7 +88,7 @@ namespace InterfaceTweaks
                 output.AddRange((row.Count > 0 ? MoneyRow(row) ?? BuildingRow(row) : null) ?? row);
                 if (i < tokens.Count)
                 {
-                    output.Add(Newline);
+                    output.Add(GameText.Newline);
                 }
                 start = i + 1;
             }
@@ -101,7 +99,7 @@ namespace InterfaceTweaks
         {
             try
             {
-                if (Plugin.IncrementalColumns.Value && sec == "righttextdown" && s != null
+                if (Plugin.IncrementalColumns.Value && sec == GameText.Body && s != null
                     && __instance != null && __instance.current_page == Page)
                 {
                     s = Arrange(s);
