@@ -26,6 +26,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> QuizNumberValues;
         internal static ConfigEntry<bool> CombinedNumbers;
         internal static ConfigEntry<bool> WordUnits;
+        internal static ConfigEntry<bool> LoneUnits;
         internal static ConfigEntry<bool> WinPages;
         internal static ConfigEntry<bool> PageNotes;
         internal static ConfigEntry<bool> NotebookTyping;
@@ -58,6 +59,9 @@ namespace InterfaceTweaks
             WordUnits = Config.Bind("Numbers", "WordUnits", true,
                 Described("Where the game's text writes a number and then a unit as a separate word, give the unit the value in human units the game gives units written with their number, shown once the game shows those.", "unit word", gate: Gates.Units,
                     unlock: "translate unit word"));
+            LoneUnits = Config.Bind("Numbers", "LoneUnits", true,
+                Described("Give a unit with no number before it the value of one of that unit in human units, as the game gives units written with their number, shown once the game shows those.", "alone unit", gate: Gates.Units,
+                    unlock: "translate alone unit"));
             WinPages = Config.Bind("Chapters", "WinPages", false,
                 Described("At the end of each chapter's menu, list the pages the game showed in the left panel when the chapter's wins reached certain counts, and at the end of a menu, the pages Mod Settings showed there when one of the menu's pages unlocked a mod's feature.", "science unlock", gate: Gates.WinPage,
                     unlock: "plural unlock de page in science"));

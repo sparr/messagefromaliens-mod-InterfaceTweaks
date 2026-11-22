@@ -9,7 +9,8 @@ namespace InterfaceTweaks
     // into the number's glyphs, the unit's glyphs, and a unit token before the unit's last glyph.
     // AlienCharacter.UpdateEarthText adds that token's value in human units to the unit's label
     // once its chapter's quizzes are won. For the plain form, add the unit token the game would
-    // have made, so the game labels those units too.
+    // have made, so the game labels those units too. A unit glyph with no number before it gets
+    // the token for one of the unit.
     internal static class UnitTokens
     {
         private sealed class Unit
@@ -141,15 +142,54 @@ namespace InterfaceTweaks
             return k >= 0 && Array.IndexOf(Operators, tokens[k]) >= 0;
         }
 
-        internal static string AddTokens(string s)
+        // The index of the glyph before index i that takes a cell, skipping tokens that are not
+        // drawn, or -1 at the start.
+        private static int PreviousGlyph(List<string> tokens, int i)
         {
-            if (s == null || !s.Contains(")number"))
+            var k = i - 1;
+            while (k >= 0 && (tokens[k].StartsWith("(") || tokens[k].StartsWith("[")))
+            {
+                k--;
+            }
+            return k;
+        }
+
+        // Glyphs after which a unit belongs to an expression, as in "x sec" or "squareroot sec":
+        // the operators, the variables, and roots and powers.
+        private static readonly string[] ExpressionGlyphs =
+            { "plus", "minus", "multiply", "divide", "exponent", "x", "y", "z", "squareroot", "root3", "exponent2", "exponent3" };
+
+        // Whether the unit starting at index i stands alone, naming one of the unit. Not after a
+        // number, an answer slot, another unit, or a glyph of an expression, and not after
+        // "terran de", where the glyph names the human unit.
+        private static bool Alone(List<string> tokens, int i)
+        {
+            var p = PreviousGlyph(tokens, i);
+            if (p < 0)
+            {
+                return true;
+            }
+            var prev = tokens[p];
+            if (prev.StartsWith("?") || QuizNumberValues.IsNumberGlyph(prev) || IsUnitGlyph(prev) || PerUnit.IsMatch(prev)
+                || Array.IndexOf(ExpressionGlyphs, prev) >= 0)
+            {
+                return false;
+            }
+            var before = PreviousGlyph(tokens, p);
+            return !(prev == "de" && before >= 0 && tokens[before] == "terran");
+        }
+
+        // afterNumbers: give a unit written as a separate word after a number with a value token
+        // that number's value. alone: give a unit with no number before it the value of one.
+        internal static string AddTokens(string s, bool afterNumbers, bool alone)
+        {
+            if (s == null || (!alone && !s.Contains(")number")))
             {
                 return s;
             }
             var tokens = new List<string>(s.Split(' '));
             var changed = false;
-            for (var i = 1; i < tokens.Count; i++)
+            for (var i = 0; i < tokens.Count; i++)
             {
                 foreach (var u in ByLength)
                 {
@@ -167,12 +207,22 @@ namespace InterfaceTweaks
                     }
                     // The game already gave it a token, from a token such as 49Ayyy: before its last
                     // glyph, or, for a unit of several glyphs such as m/s², right after this one.
-                    if (IsUnitToken(tokens[last - 1]) || (last + 1 < tokens.Count && IsUnitToken(tokens[last + 1])))
+                    if ((last > 0 && IsUnitToken(tokens[last - 1])) || (last + 1 < tokens.Count && IsUnitToken(tokens[last + 1])))
                     {
                         break;
                     }
-                    var token = NumberValue(tokens, i);
-                    if (token != null && !AfterOperator(tokens, i) && Value(token, out var value))
+                    double value = 1;
+                    var token = afterNumbers ? NumberValue(tokens, i) : null;
+                    bool found;
+                    if (token != null)
+                    {
+                        found = !AfterOperator(tokens, i) && Value(token, out value);
+                    }
+                    else
+                    {
+                        found = alone && Alone(tokens, i);
+                    }
+                    if (found)
                     {
                         var human = value / Global.HumanUnitToAlienUnit(u.Code);
                         if (!double.IsNaN(human) && !double.IsInfinity(human))
@@ -192,9 +242,9 @@ namespace InterfaceTweaks
         {
             try
             {
-                if (Plugin.WordUnits.Value)
+                if (Plugin.WordUnits.Value || Plugin.LoneUnits.Value)
                 {
-                    s = AddTokens(s);
+                    s = AddTokens(s, Plugin.WordUnits.Value, Plugin.LoneUnits.Value);
                 }
             }
             catch (Exception e)
