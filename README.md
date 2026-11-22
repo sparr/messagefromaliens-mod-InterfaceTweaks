@@ -29,6 +29,18 @@ Install BepInEx first, if you haven't already, as described under [Requirements]
 
 Each minesweeper tweak has a row of glyphs in the board page's bottom-right corner, its name and then yes or no, that turns it on and off.
 
+![Combined number labels](screenshot_numbers.png)
+
+Combined number labels: each number's base 7 value, with its base 10 value in parentheses.
+
+![Page notes](screenshot_pagenotes.png)
+
+A page's notes in the left panel, beside the page they belong to.
+
+![Compact and centered minesweeper](screenshot_minesweeper.png)
+
+The minesweeper board, compact and centered, with the tweaks' toggles in its bottom-right corner.
+
 ## Configuration
 
 `BepInEx/config/sparr.messagefromaliens.interfacetweaks.cfg`, created on first launch:
