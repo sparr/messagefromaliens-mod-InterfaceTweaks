@@ -33,7 +33,8 @@ namespace InterfaceTweaks
             internal Screen Screen;
         }
 
-        // The navigation state of a redraw, and a fingerprint of what it drew.
+        // The navigation state of a redraw, and a fingerprint of what it drew, which only the
+        // redraw's own capture takes.
         private sealed class Screen
         {
             internal Dictionary<FieldInfo, object> Fields;
@@ -111,7 +112,6 @@ namespace InterfaceTweaks
                 TextHistory = new List<string>(d.text_history),
                 LeftPages = new List<int>(d.currentleftpage),
                 CurrentText = d.currenttext,
-                Fingerprint = Fingerprint(d),
                 NoteName = OpenNote(d),
                 NoteText = NoteText(OpenNote(d)),
                 Filter = Global.GetFlag("hide_unknown_word", 0L),
@@ -245,15 +245,30 @@ namespace InterfaceTweaks
         // UpdateText1 clear every cell rather than only the right panel's text. UpdateText also
         // schedules a redraw at the end of this Update, which is cleared as Draw.Update clears
         // it, since that redraw would have no tag and clear only part of the screen.
+        //
+        // If the redraw throws, UpdateText1's capture may not have run, so the screen is
+        // captured here as far as it was drawn.
         private static void Redraw(Draw d)
         {
-            d.UpdateText();
-            d.UpdateText1();
-            TextToUpdate.SetValue(d, false);
-            Canvas.ForceUpdateCanvases();
-            foreach (var ac in UnityEngine.Object.FindObjectsByType<AlienCharacter>())
+            var drawn = false;
+            try
             {
-                ac.UpdatePos();
+                d.UpdateText();
+                d.UpdateText1();
+                TextToUpdate.SetValue(d, false);
+                Canvas.ForceUpdateCanvases();
+                foreach (var ac in UnityEngine.Object.FindObjectsByType<AlienCharacter>())
+                {
+                    ac.UpdatePos();
+                }
+                drawn = true;
+            }
+            finally
+            {
+                if (!drawn)
+                {
+                    CaptureLastScreen(d);
+                }
             }
         }
 
@@ -310,8 +325,9 @@ namespace InterfaceTweaks
             }
             finally
             {
+                // Each redraw above has already captured lastScreen, in UpdateText1's capture or,
+                // if it threw, in Redraw's.
                 undoing = false;
-                lastScreen = Capture(d);
             }
         }
 
@@ -349,13 +365,17 @@ namespace InterfaceTweaks
             }
         }
 
-        internal static void UpdateText1Postfix(Draw __instance)
+        internal static void UpdateText1Postfix(Draw __instance) => CaptureLastScreen(__instance);
+
+        private static void CaptureLastScreen(Draw d)
         {
             try
             {
                 if (Plugin.UndoEnabled.Value)
                 {
-                    lastScreen = Capture(__instance);
+                    var screen = Capture(d);
+                    screen.Fingerprint = Fingerprint(d);
+                    lastScreen = screen;
                 }
             }
             catch (Exception e)
