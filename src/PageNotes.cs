@@ -14,7 +14,7 @@ namespace InterfaceTweaks
     // left panel shows a page's notes, opening another page on the right shows that page's notes.
     //
     // A notes page is a left panel history entry titled with the page's name and the notes
-    // glyph, with no text. Its area holds one English text field, as Glyph Notes has on a word's
+    // glyph, with no text. Its area holds one English text field, as Research Notes has on a word's
     // information panel. Notes are stored in Global.savedata.dict under KeyPrefix + the page.
     internal static class PageNotes
     {
