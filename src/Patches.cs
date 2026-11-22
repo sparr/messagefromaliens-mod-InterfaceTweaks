@@ -90,6 +90,7 @@ namespace InterfaceTweaks
             NoteImage.WritePrefix(__instance, ref s, sec);
             PageNotes.WritePrefix(__instance, ref s, sec);
             QuizNumberValues.WritePrefix();
+            IncrementalLayout.WritePrefix(__instance, ref s, sec);
             RightAlignSettings.WritePrefix(__instance, ref s, sec);
             UnitTokens.WritePrefix(ref s);
         }
