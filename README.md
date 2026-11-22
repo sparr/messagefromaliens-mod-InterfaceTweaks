@@ -64,6 +64,8 @@ Each gated setting also declares its feature's words in glyphs, from which Mod S
 
 - BepInEx 5.4.23.6 or later, `BepInEx_win_x64` build, unzipped into the game folder. Tested with Unity 6000.6.8f1.
 - On Linux under Proton, set the Steam launch options to `WINEDLLOVERRIDES="winhttp=n,b" %command%`.
+- Optional: [Mod Settings](https://github.com/sparr/messagefromaliens-mod-ModSettings) 0.2.0 or later, to change settings in the game, list each once the game unlocks what it is for, and show unlock messages.
+- Optional: [Calculator](https://github.com/sparr/messagefromaliens-mod-Calculator), any version. Some tweaks hold back while its calculator is open, as described above.
 - .NET SDK 8 or later to build.
 
 ## Building
