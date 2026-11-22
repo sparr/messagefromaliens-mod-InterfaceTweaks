@@ -30,7 +30,6 @@ namespace InterfaceTweaks
 
         // The category that holds win pages, to which Mod Settings adds pages the game has no
         // text for.
-        private const string InfoCategory = "alieninfo";
 
         // The Global.alien_message the index was built from, and its win pages' category and
         // that category's count of pages then.
@@ -84,7 +83,7 @@ namespace InterfaceTweaks
             {
                 return;
             }
-            messages.TryGetValue(InfoCategory, out var info);
+            messages.TryGetValue(GameText.InfoCategory, out var info);
             var infoCount = info?.Count ?? -1;
             if (ReferenceEquals(messages, indexed) && ReferenceEquals(info, indexedInfo) && infoCount == indexedInfoCount)
             {
@@ -208,7 +207,7 @@ namespace InterfaceTweaks
             return pages.TryGetValue(name, out var page) ? page : null;
         }
 
-        private static string Line(string name) => " " + ChapterNumbers.Newline + " " + string.Join(" ", Global.StringToListString(name));
+        private static string Line(string name) => " " + GameText.Newline + " " + string.Join(" ", Global.StringToListString(name));
 
         // Adds the unlocked win pages to the end of the menu's lines.
         internal static void GetInfoPostfix(string s, ref string __result)
@@ -225,7 +224,7 @@ namespace InterfaceTweaks
                 {
                     // A page has no text when Mod Settings added it and none of its lines
                     // show.
-                    if (Unlocked(page) && !string.IsNullOrEmpty(Global.GetInfo(InfoCategory, page.Name)))
+                    if (Unlocked(page) && !string.IsNullOrEmpty(Global.GetInfo(GameText.InfoCategory, page.Name)))
                     {
                         // Parse the name as the text files write it, as the game parses
                         // page text, so its number gets the token that shows its value.
@@ -235,7 +234,7 @@ namespace InterfaceTweaks
                 foreach (var name in termMenus.TryGetValue(s, out var names) ? names : Enumerable.Empty<string>())
                 {
                     // It has text while Mod Settings shows one of its lines.
-                    if (!string.IsNullOrEmpty(Global.GetInfo(InfoCategory, name)))
+                    if (!string.IsNullOrEmpty(Global.GetInfo(GameText.InfoCategory, name)))
                     {
                         if (!termLines.TryGetValue(name, out var line))
                         {

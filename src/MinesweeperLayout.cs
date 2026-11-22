@@ -109,7 +109,7 @@ namespace InterfaceTweaks
             d != null && d.currenttext >= 0 && d.currenttext < d.text_history.Count
             && d.text_history[d.currenttext].StartsWith(SolutionTitle + "&")
             && d.alien_left_title != null
-            && string.Join(" ", d.alien_left_title.Where(a => a != null && a.gameObject.activeInHierarchy && a.sector == "lefttitle").Select(a => a.alien_txt)) == SolutionTitle;
+            && string.Join(" ", d.alien_left_title.Where(a => a != null && a.gameObject.activeInHierarchy && a.sector == GameText.LeftTitle).Select(a => a.alien_txt)) == SolutionTitle;
 
         // Moves a board's glyphs by the offset, and if compact, hides their labels and moves each
         // row up to close the gap above it.

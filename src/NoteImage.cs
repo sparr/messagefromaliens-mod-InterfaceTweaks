@@ -19,8 +19,6 @@ namespace InterfaceTweaks
         // The button's glyph, which the game's own click handling treats as any other editor
         // button it has no action for: it shows the note in the left panel again.
         internal const string Button = "picture";
-        private const string MenuSector = "rightmenu";
-        private const int MenuCells = 12;
 
         // The left panel's text area in world units: 12 cells wide, 8 rows of 1.5 below the line
         // under its title row, at y = 5.25, and left of the line between the panels, at x = 0.
@@ -325,7 +323,7 @@ namespace InterfaceTweaks
         {
             try
             {
-                if (sec != MenuSector || s == null)
+                if (sec != GameText.RightMenu || s == null)
                 {
                     return;
                 }
@@ -334,7 +332,7 @@ namespace InterfaceTweaks
                 {
                     return;
                 }
-                if (s.Split(' ').Count(GameText.TakesCell) >= MenuCells)
+                if (s.Split(' ').Count(GameText.TakesCell) >= GameText.RowWidth)
                 {
                     return;
                 }
@@ -362,7 +360,7 @@ namespace InterfaceTweaks
                     return;
                 }
                 var ac = hit.transform.GetComponentInParent<AlienCharacter>();
-                if (ac != null && ac.sector == MenuSector && ac.alien_txt == Button)
+                if (ac != null && ac.sector == GameText.RightMenu && ac.alien_txt == Button)
                 {
                     Start(__instance);
                 }

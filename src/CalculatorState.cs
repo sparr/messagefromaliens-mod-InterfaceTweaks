@@ -10,7 +10,7 @@ namespace InterfaceTweaks
     // loaded assembly, and log a warning when Calculator is not installed.
     internal static class CalculatorState
     {
-        private const string CalculatorGuid = "sparr.messagefromaliens.calculator";
+        internal const string CalculatorGuid = "sparr.messagefromaliens.calculator";
 
         private static bool resolved;
         private static FieldInfo open;

@@ -16,7 +16,6 @@ namespace InterfaceTweaks
     // glyphs' own labels show instead, so they can still be edited.
     internal static class NumberLabels
     {
-        private const int RowWidth = 12;
 
         private sealed class Number
         {
@@ -49,7 +48,7 @@ namespace InterfaceTweaks
         // The game's value tokens, which Global.StringToListString attaches to a number's last
         // glyph, and the unit tokens it attaches to a unit's last glyph, with the quizzes that
         // must be won for the game to show each kind.
-        private static bool HasValue(AlienCharacter ac) => ac.extra_info != null && ac.extra_info.EndsWith("number");
+        private static bool HasValue(AlienCharacter ac) => ac.extra_info != null && ac.extra_info.EndsWith(GameText.ValueKind);
 
         private static string UnitSuffix(AlienCharacter ac)
         {
@@ -75,7 +74,7 @@ namespace InterfaceTweaks
         // Glyphs that can be part of a number label: drawn, with a label, outside the menus.
         private static bool Labeled(AlienCharacter ac) =>
             ac != null && ac.gameObject.activeSelf && ac.showtxt && ac.txt != null && ac.txt.gameObject.activeSelf
-            && ac.sector != "leftmenu" && ac.sector != "rightmenu";
+            && ac.sector != GameText.LeftMenu && ac.sector != GameText.RightMenu;
 
         // The sentences on screen, each as its glyphs in reading order: rows from the top, cells
         // from the left. Draw.Write numbers a sentence's rows downward with falling line_y.
@@ -84,7 +83,7 @@ namespace InterfaceTweaks
             var groups = new Dictionary<(string, int, int), List<AlienCharacter>>();
             foreach (var ac in d.alien_slots)
             {
-                if (!Labeled(ac) || (ac.sector == "righttextdown" && MinesweeperLayout.OnBoard(d)))
+                if (!Labeled(ac) || (ac.sector == GameText.Body && MinesweeperLayout.OnBoard(d)))
                 {
                     continue;
                 }
@@ -108,7 +107,7 @@ namespace InterfaceTweaks
         // ends a full row, as a wrapped sentence continues.
         private static bool Follows(AlienCharacter a, AlienCharacter b, AlienCharacter rowStart) =>
             (b.line_y == a.line_y && b.line_x == a.line_x + 1)
-            || (b.line_y == a.line_y - 1 && a.line_x == RowWidth - 1 && b == rowStart && b.line_x <= 1);
+            || (b.line_y == a.line_y - 1 && a.line_x == GameText.RowWidth - 1 && b == rowStart && b.line_x <= 1);
 
         // Splits a sentence into runs of adjacent cells.
         private static List<List<AlienCharacter>> Runs(List<AlienCharacter> sentence)
@@ -200,7 +199,7 @@ namespace InterfaceTweaks
                 var single = end == j + 1 && QuizNumberValues.IsPlace(glyphs[j], out _, out _);
                 var base7 = Base7(glyphs, j, end, out var repeatStart, out var repeatLength);
                 var base10 = HasValue(last)
-                    ? last.extra_info.Substring(0, last.extra_info.Length - "number".Length)
+                    ? last.extra_info.Substring(0, last.extra_info.Length - GameText.ValueKind.Length)
                     : "(" + QuizNumberValues.Format(value, repeats, single) + ")";
                 var text = new StringBuilder(base7);
                 if (base10 != "(" + base7 + ")")

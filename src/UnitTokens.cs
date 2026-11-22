@@ -56,7 +56,7 @@ namespace InterfaceTweaks
 
         private static bool IsUnitGlyph(string t) => Array.Exists(Units, u => Array.IndexOf(u.Glyphs, t) >= 0);
 
-        private static bool IsValueToken(string t) => t.StartsWith("(") && t.EndsWith(")number");
+        private static bool IsValueToken(string t) => t.StartsWith("(") && t.EndsWith(")" + GameText.ValueKind);
 
         private static bool IsUnitToken(string t) =>
             t.StartsWith("(") && (t.EndsWith(")unit") || t.EndsWith(")electricity") || t.EndsWith(")heat"));
@@ -65,7 +65,7 @@ namespace InterfaceTweaks
         // fraction as n/d.
         private static bool Value(string token, out double value)
         {
-            var s = token.Substring(1, token.Length - 1 - ")number".Length);
+            var s = token.Substring(1, token.Length - 2 - GameText.ValueKind.Length);
             var slash = s.IndexOf('/');
             if (slash > 0)
             {
@@ -183,7 +183,7 @@ namespace InterfaceTweaks
         // that number's value. alone: give a unit with no number before it the value of one.
         internal static string AddTokens(string s, bool afterNumbers, bool alone)
         {
-            if (s == null || (!alone && !s.Contains(")number")))
+            if (s == null || (!alone && !s.Contains(")" + GameText.ValueKind)))
             {
                 return s;
             }

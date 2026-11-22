@@ -144,16 +144,16 @@ namespace InterfaceTweaks
         private static void Page(Draw d, bool next)
         {
             var word = next ? NextPage : PrevPage;
-            var left = HasPages(d, "leftmenu");
-            var right = HasPages(d, "rightmenu");
+            var left = HasPages(d, GameText.LeftMenu);
+            var right = HasPages(d, GameText.RightMenu);
             if (left && (!right || lastClickLeft))
             {
-                if (MenuShows(d, "leftmenu", word))
+                if (MenuShows(d, GameText.LeftMenu, word))
                 {
                     PageLeft(d, next);
                 }
             }
-            else if (right && MenuShows(d, "rightmenu", word))
+            else if (right && MenuShows(d, GameText.RightMenu, word))
             {
                 PageRight(d, next);
             }

@@ -11,8 +11,6 @@ namespace InterfaceTweaks
     internal static class MinesweeperToggles
     {
         private const string Sector = "interfacetweaks.toggle";
-        private const string OnWord = "yes";
-        private const string OffWord = "no";
 
         private sealed class Toggle
         {
@@ -60,8 +58,8 @@ namespace InterfaceTweaks
                 var row = 0;
                 foreach (var t in Toggles())
                 {
-                    var text = t.Name + " " + (t.Entry.Value ? OnWord : OffWord);
-                    t.Glyphs.AddRange(__instance.Write(text, 12, width, row, isLeft: false, isUp: true, showTranslation: true,
+                    var text = t.Name + " " + (t.Entry.Value ? GameText.Yes : GameText.No);
+                    t.Glyphs.AddRange(__instance.Write(text, GameText.RowWidth, width, row, isLeft: false, isUp: true, showTranslation: true,
                         __instance.text_linewidth, Sector, 1f, nospacing: true));
                     row++;
                 }

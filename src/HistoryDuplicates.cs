@@ -20,7 +20,7 @@ namespace InterfaceTweaks
         private static class PushLeftTextPatch
         {
             [HarmonyPriority(Priority.Last)]
-            [HarmonyAfter("sparr.messagefromaliens.calculator", "sparr.messagefromaliens.compoundtranslations")]
+            [HarmonyAfter(CalculatorState.CalculatorGuid, "sparr.messagefromaliens.compoundtranslations")]
             private static bool Prefix(Draw __instance, string title, string info, bool noparse, bool __runOriginal)
             {
                 try

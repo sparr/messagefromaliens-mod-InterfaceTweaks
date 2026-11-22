@@ -142,7 +142,7 @@ namespace InterfaceTweaks
                     for (var y = 0; y < d.alien_slots.GetLength(1); y++)
                     {
                         var ac = d.alien_slots[x, y];
-                        if (ac != null && ac.gameObject.activeInHierarchy && ac.sector != null && ac.sector.StartsWith("right") && ac.sector != "rightmenu")
+                        if (ac != null && ac.gameObject.activeInHierarchy && ac.sector != null && ac.sector.StartsWith("right") && ac.sector != GameText.RightMenu)
                         {
                             hash = Hash(hash, x);
                             hash = Hash(hash, y);

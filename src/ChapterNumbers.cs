@@ -12,8 +12,6 @@ namespace InterfaceTweaks
         // The chapter glyph, and the glyph the second chapter menu's title puts before it.
         private const string Chapter = "science";
         private const string Second = "optional";
-        internal const string Newline = "newline";
-        private const string Newpage = "newpage";
         // A number's glyphs, in base 7 as the game writes it.
         private static string Number(int n) => string.Join(" ", Global.ToBase7(n));
 
@@ -46,7 +44,7 @@ namespace InterfaceTweaks
             var start = 0;
             for (var i = 0; i <= tokens.Count; i++)
             {
-                if (i < tokens.Count && tokens[i] != Newline && tokens[i] != Newpage)
+                if (i < tokens.Count && tokens[i] != GameText.Newline && tokens[i] != GameText.Newpage)
                 {
                     continue;
                 }
@@ -87,7 +85,7 @@ namespace InterfaceTweaks
                     return;
                 }
                 var page = __instance.current_page;
-                if (sec == "righttextdown" && Global.link_message != null
+                if (sec == GameText.Body && Global.link_message != null
                     && Global.link_message.TryGetValue(page, out var chapters) && chapters != null)
                 {
                     var renamed = new Dictionary<string, string>();
@@ -98,7 +96,7 @@ namespace InterfaceTweaks
                         __state = renamed;
                     }
                 }
-                else if (sec == "righttitle" && (s == page || s.StartsWith(page + " ")) && PrefixFor(page, true) is string prefix)
+                else if (sec == GameText.RightTitle && (s == page || s.StartsWith(page + " ")) && PrefixFor(page, true) is string prefix)
                 {
                     s = string.Join(" ", Parsed(prefix)) + " " + s;
                     __state = new Dictionary<string, string> { [prefix + " " + page] = page };
@@ -123,7 +121,7 @@ namespace InterfaceTweaks
             {
                 var marked = __instance?.marked_word;
                 List<string> sources = null;
-                var highlight = sec == "righttextdown" && !string.IsNullOrEmpty(marked)
+                var highlight = sec == GameText.Body && !string.IsNullOrEmpty(marked)
                     && Global.word_source != null && Global.word_source.TryGetValue(marked, out sources) && sources != null;
                 foreach (var ac in __result)
                 {

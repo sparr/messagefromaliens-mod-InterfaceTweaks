@@ -33,7 +33,7 @@ namespace InterfaceTweaks
                         {
                             continue;
                         }
-                        __result.Insert(i, "(" + m.Groups[1].Value + ")number");
+                        __result.Insert(i, "(" + m.Groups[1].Value + ")" + GameText.ValueKind);
                         i++;
                     }
                 }

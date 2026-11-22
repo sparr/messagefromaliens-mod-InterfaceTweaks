@@ -27,7 +27,6 @@ namespace InterfaceTweaks
         // The left panel's text rows and columns, below its title row.
         private const int FirstRow = 1;
         private const int Rows = 8;
-        private const int Columns = 12;
         private const int CharacterLimit = 20000;
         private const float Inset = 0.12f;
         private const float Padding = 0.1f;
@@ -65,7 +64,7 @@ namespace InterfaceTweaks
             // as Mod Settings' pages, whose explanations it opens by this rule whatever their names.
             if (p.StartsWith("["))
             {
-                return Global.GetInfo("alieninfo", p + " de tutorial") != "" ? p + " de tutorial" : null;
+                return Global.GetInfo(GameText.InfoCategory, p + GameText.ExplanationSuffix) != "" ? p + GameText.ExplanationSuffix : null;
             }
             var later = Global.CountWin("geometry riddle") >= 5 && !Global.isDemo;
             if (p.Contains("riddle") && p != "bonus arithmetic riddle" && p != "last riddle")
@@ -80,7 +79,7 @@ namespace InterfaceTweaks
             {
                 return "hero de arena de tutorial";
             }
-            return Global.GetInfo("alieninfo", p + " de tutorial") != "" ? p + " de tutorial" : null;
+            return Global.GetInfo(GameText.InfoCategory, p + GameText.ExplanationSuffix) != "" ? p + GameText.ExplanationSuffix : null;
         }
 
         // Whether the left panel shows the current page's explanation.
@@ -137,7 +136,7 @@ namespace InterfaceTweaks
             var words = new List<string>();
             foreach (var ac in d.alien_left_title)
             {
-                if (ac != null && ac.gameObject.activeInHierarchy && ac.sector == "lefttitle")
+                if (ac != null && ac.gameObject.activeInHierarchy && ac.sector == GameText.LeftTitle)
                 {
                     words.Add(ac.alien_txt);
                 }
@@ -300,7 +299,7 @@ namespace InterfaceTweaks
         private static void Area(Draw d, out Vector2 min, out Vector2 max)
         {
             min = d.PosToScreenPos(0, FirstRow + Rows, false);
-            max = d.PosToScreenPos(Columns, FirstRow, false);
+            max = d.PosToScreenPos(GameText.RowWidth, FirstRow, false);
         }
 
         // Places the field over the left panel's text rows. Its pivot is its bottom-left corner.
@@ -363,7 +362,7 @@ namespace InterfaceTweaks
         {
             try
             {
-                if (sec != "rightmenu" || s == null)
+                if (sec != GameText.RightMenu || s == null)
                 {
                     return;
                 }
@@ -403,7 +402,7 @@ namespace InterfaceTweaks
                     return;
                 }
                 var ac = hit.transform.GetComponentInParent<AlienCharacter>();
-                if (ac != null && ac.sector == "rightmenu" && ac.alien_txt == NotesButton)
+                if (ac != null && ac.sector == GameText.RightMenu && ac.alien_txt == NotesButton)
                 {
                     Open(__instance);
                 }

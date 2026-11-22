@@ -11,15 +11,11 @@ namespace InterfaceTweaks
     {
         private const string ExitWord = "end";
         private const string QuestionWord = "whether";
-        private const string YesWord = "yes";
-        private const string NoWord = "no";
-        // Draw.Write splits page text into lines at this token.
-        private const string Lines = YesWord + " newline " + NoWord;
+        // One line for each choice.
+        private const string Lines = GameText.Yes + " " + GameText.Newline + " " + GameText.No;
         // The explain button's text, in the form of the game's own: one line per click action.
         private const string Tutorial =
-            "left click " + YesWord + " for " + ExitWord + " game newline left click " + NoWord + " for leave";
-        // Draw.GetHelp looks up a page's explanation under this suffix.
-        private const string TutorialSuffix = " de tutorial";
+            "left click " + GameText.Yes + " for " + ExitWord + " game " + GameText.Newline + " left click " + GameText.No + " for leave";
 
         // The confirmation page's name, which the game also shows as its title.
         private static string page;
@@ -67,12 +63,12 @@ namespace InterfaceTweaks
                 {
                     return true;
                 }
-                if (s == YesWord)
+                if (s == GameText.Yes)
                 {
                     Application.Quit();
                     return false;
                 }
-                if (s == NoWord)
+                if (s == GameText.No)
                 {
                     __instance.ToParentPage();
                     return false;
@@ -98,7 +94,7 @@ namespace InterfaceTweaks
         // The game reads a page's lines, and its explanation, from its text files by page name.
         internal static bool GetInfoPrefix(string category, string s, ref string __result)
         {
-            if (page == null || category != "alieninfo" || !IsOpen(Global.manager))
+            if (page == null || category != GameText.InfoCategory || !IsOpen(Global.manager))
             {
                 return true;
             }
@@ -107,7 +103,7 @@ namespace InterfaceTweaks
                 __result = Lines;
                 return false;
             }
-            if (s == page + TutorialSuffix)
+            if (s == page + GameText.ExplanationSuffix)
             {
                 __result = Tutorial;
                 return false;

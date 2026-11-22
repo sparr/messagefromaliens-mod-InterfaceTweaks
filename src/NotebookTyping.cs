@@ -120,23 +120,23 @@ namespace InterfaceTweaks
         }
 
         // Where the cursor would be drawn before each token of the note, and after the last, as
-        // rows and columns: a row holds 12 cells, a row that continues on the next starts one cell
-        // in, as Draw.Write wraps text with spacing, and "newline" starts a new row.
+        // rows and columns: a row holds GameText.RowWidth cells, a row that continues on the next
+        // starts one cell in, as Draw.Write wraps text with spacing, and a line break starts a new
+        // row.
         private static List<(int Row, int Col)> Layout(List<string> note)
         {
-            const int width = 12;
             var at = new List<(int, int)>();
             int row = 0, col = 0;
             foreach (var t in note)
             {
-                if (t == "newline")
+                if (t == GameText.Newline)
                 {
                     at.Add((row, col));
                     row++;
                     col = 0;
                     continue;
                 }
-                if (GameText.TakesCell(t) && col >= width)
+                if (GameText.TakesCell(t) && col >= GameText.RowWidth)
                 {
                     row++;
                     col = 1;
@@ -304,7 +304,7 @@ namespace InterfaceTweaks
             {
                 if (Enter)
                 {
-                    Insert(d, "newline");
+                    Insert(d, GameText.Newline);
                 }
                 else if (Input.GetKeyDown(KeyCode.LeftArrow))
                 {
@@ -357,7 +357,7 @@ namespace InterfaceTweaks
                     Insert(d, word);
                     if (enter)
                     {
-                        Insert(d, "newline");
+                        Insert(d, GameText.Newline);
                     }
                 }
             }

@@ -8,10 +8,7 @@ namespace InterfaceTweaks
     internal static class RightAlignSettings
     {
         private const string SettingsPage = "modify game";
-        private const string Gap = ".";
-        private const string Newline = "newline";
         // Glyph cells in one row of the right page.
-        private const int RowWidth = 12;
 
         private static bool Applies(Draw d) => d?.parent_page != null && d.parent_page.Contains(SettingsPage);
 
@@ -22,22 +19,22 @@ namespace InterfaceTweaks
             var start = 0;
             for (var i = 0; i <= tokens.Count; i++)
             {
-                if (i < tokens.Count && tokens[i] != Newline)
+                if (i < tokens.Count && tokens[i] != GameText.Newline)
                 {
                     continue;
                 }
                 var row = tokens.GetRange(start, i - start);
-                var gap = row.IndexOf(Gap);
+                var gap = row.IndexOf(GameText.Gap);
                 var cells = row.Count(GameText.TakesCell);
                 // Only rows with choices after the gap, and room to spare.
-                if (gap > 0 && gap < row.Count - 1 && cells < RowWidth)
+                if (gap > 0 && gap < row.Count - 1 && cells < GameText.RowWidth)
                 {
-                    row.InsertRange(gap, Enumerable.Repeat(Gap, RowWidth - cells));
+                    row.InsertRange(gap, Enumerable.Repeat(GameText.Gap, GameText.RowWidth - cells));
                 }
                 output.AddRange(row);
                 if (i < tokens.Count)
                 {
-                    output.Add(Newline);
+                    output.Add(GameText.Newline);
                 }
                 start = i + 1;
             }
@@ -48,7 +45,7 @@ namespace InterfaceTweaks
         {
             try
             {
-                if (Plugin.RightAlignSettings.Value && sec == "righttextdown" && s != null && Applies(__instance))
+                if (Plugin.RightAlignSettings.Value && sec == GameText.Body && s != null && Applies(__instance))
                 {
                     s = Align(s);
                 }

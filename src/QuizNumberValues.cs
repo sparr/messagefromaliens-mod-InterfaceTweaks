@@ -180,7 +180,6 @@ namespace InterfaceTweaks
 
         // Cells in a row of text, as Draw.Write wraps it: a row that continues on the next
         // starts one cell in, or at the first cell for text written without spacing.
-        private const int RowWidth = 12;
         private static readonly System.Reflection.FieldInfo NoSpacing = AccessTools.Field(typeof(Draw), "r_nospacing");
 
         // The glyph a's grid cell is x, y. The glyph that directly follows (step 1) or precedes
@@ -194,13 +193,13 @@ namespace InterfaceTweaks
             }
             var indent = (bool)NoSpacing.GetValue(d) ? 0 : 1;
             var first = x - a.line_x;
-            if (step > 0 && a.line_x == RowWidth - 1)
+            if (step > 0 && a.line_x == GameText.RowWidth - 1)
             {
                 return At(d, a, first + indent, y - 1, a.line_y - 1, indent);
             }
             if (step < 0 && a.line_x == indent)
             {
-                return At(d, a, first + RowWidth - 1, y + 1, a.line_y + 1, RowWidth - 1);
+                return At(d, a, first + GameText.RowWidth - 1, y + 1, a.line_y + 1, GameText.RowWidth - 1);
             }
             return null;
         }
@@ -221,7 +220,7 @@ namespace InterfaceTweaks
         // A drawn glyph that joins the answer slots beside it into one number: a number glyph the
         // game's text gives no value of its own, as where the answer is a number's leading digits.
         private static bool Joins(Draw d, AlienCharacter ac) =>
-            !d.slots.Contains(ac) && IsNumberGlyph(ac.alien_txt) && (ac.extra_info == null || !ac.extra_info.EndsWith("number"));
+            !d.slots.Contains(ac) && IsNumberGlyph(ac.alien_txt) && (ac.extra_info == null || !ac.extra_info.EndsWith(GameText.ValueKind));
 
         private static bool Find(Draw d, AlienCharacter ac, out int x, out int y)
         {
@@ -317,7 +316,7 @@ namespace InterfaceTweaks
             writing = false;
             try
             {
-                if (sec == "righttextdown")
+                if (sec == GameText.Body)
                 {
                     Annotate(__instance, null);
                 }
@@ -335,7 +334,7 @@ namespace InterfaceTweaks
             {
                 var d = Global.manager;
                 // Only a number's glyphs are labeled.
-                if (!writing && d?.slots != null && d.slots.Count > 0 && __instance.sector == "righttextdown" && IsNumberGlyph(__instance.alien_txt))
+                if (!writing && d?.slots != null && d.slots.Count > 0 && __instance.sector == GameText.Body && IsNumberGlyph(__instance.alien_txt))
                 {
                     Annotate(d, __instance);
                 }
