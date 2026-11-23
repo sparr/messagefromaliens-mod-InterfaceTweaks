@@ -16,7 +16,7 @@ namespace InterfaceTweaks
         // The English name stands in for the glyph name above where glyphs cannot be shown.
         public const string Guid = "sparr.messagefromaliens.interfacetweaks";
         public const string Name = "Interface Tweaks";
-        public const string Version = "0.4.0";
+        public const string Version = "0.5.0";
 
         internal static ManualLogSource Log;
         internal static Plugin Instance;
