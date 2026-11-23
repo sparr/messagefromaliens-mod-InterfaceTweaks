@@ -74,7 +74,7 @@ namespace InterfaceTweaks
                 Described("In the note editor, show a button at the left end of the buttons at the top right that copies an image of the whole note, every page of it, to the clipboard.", "word picture", gate: Gates.NoteEditor,
                     unlock: "picture de write", unlockPage: "home"));
             SearchButton = Config.Bind("Dictionary", "SearchButton", true,
-                Described("On the dictionary page, while the left panel shows a word's definition, show a button at the left end of the buttons at the top right that lists in the left panel every sentence you can see in the game so far that contains the word.", "see sentence with word", gate: Gates.Dictionary,
+                Described("On the dictionary page, while the left panel shows a word's definition, show a button at the left end of the buttons at the top right, just right of the dictionary filter's button, that lists in the left panel every sentence you can see in the game so far that contains the word.", "see sentence with word", gate: Gates.Dictionary,
                     unlock: "see sentence with word"));
             DictionaryFilter = Config.Bind("Dictionary", "TypeFilter", true,
                 Described("On the dictionary page, show a button at the left end of the buttons at the top right. Click it or press Ctrl+F, then type, to list only the categories and words whose translations contain the typed text, which shows in a box in place of the button's translation. Clicking it or Ctrl+F again empties the box, and Escape removes it.", "see word by translate", gate: Gates.Dictionary,
