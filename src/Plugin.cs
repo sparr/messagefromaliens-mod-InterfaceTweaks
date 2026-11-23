@@ -31,6 +31,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> NotebookTyping;
         internal static ConfigEntry<bool> NoteImageButton;
         internal static ConfigEntry<bool> SearchButton;
+        internal static ConfigEntry<bool> DictionaryFilter;
         internal static ConfigEntry<bool> CompactMinesweeper;
         internal static ConfigEntry<bool> CenterMinesweeper;
         internal static ConfigEntry<bool> IncrementalColumns;
@@ -75,6 +76,9 @@ namespace InterfaceTweaks
             SearchButton = Config.Bind("Dictionary", "SearchButton", true,
                 Described("On the dictionary page, while the left panel shows a word's definition, show a button at the left end of the buttons at the top right that lists in the left panel every sentence you can see in the game so far that contains the word.", "see sentence with word", gate: Gates.Dictionary,
                     unlock: "see sentence with word"));
+            DictionaryFilter = Config.Bind("Dictionary", "TypeFilter", true,
+                Described("On the dictionary page, show a button at the left end of the buttons at the top right. Click it or press Ctrl+F, then type, to list only the categories and words whose translations contain the typed text, which shows in a box in place of the button's translation. Clicking it or Ctrl+F again empties the box, and Escape removes it.", "see word by translate", gate: Gates.Dictionary,
+                    unlock: "see word by translate"));
             CompactMinesweeper = Config.Bind("Minesweeper", "CompactBoard", true,
                 Described("On the minesweeper board and the solution shown after a wrong answer, hide the translations and close the gaps between rows. Also toggled by the glyphs in the board page's bottom-right corner.", "trap tohide", gate: MinesweeperLayout.BoardGate,
                     unlock: "small detrap in small game"));

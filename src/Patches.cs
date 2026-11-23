@@ -19,6 +19,7 @@ namespace InterfaceTweaks
             NotebookTyping.UpdatePrefix(__instance);
             NoteImage.UpdatePrefix(__instance);
             DictionarySearch.UpdatePrefix(__instance);
+            DictionaryFilter.UpdatePrefix(__instance);
             UndoTranslations.UpdatePrefix(__instance);
         }
 
@@ -38,6 +39,7 @@ namespace InterfaceTweaks
             NotebookTyping.UpdatePostfix(__instance);
             NumberLabels.UpdatePostfix();
             DictionarySearch.UpdatePostfix(__instance);
+            DictionaryFilter.UpdatePostfix(__instance);
         }
 
         [HarmonyFinalizer]
@@ -87,6 +89,7 @@ namespace InterfaceTweaks
             ChapterNumbers.WritePrefix(__instance, ref s, sec, out __state);
             NoteImage.WritePrefix(__instance, ref s, sec);
             DictionarySearch.WritePrefix(__instance, ref s, sec);
+            DictionaryFilter.WritePrefix(__instance, ref s, sec);
             QuizNumberValues.WritePrefix();
             IncrementalLayout.WritePrefix(__instance, ref s, sec);
             RightAlignSettings.WritePrefix(__instance, ref s, sec);

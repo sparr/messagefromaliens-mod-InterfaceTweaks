@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added dictionary search.
+- Added dictionary search and the dictionary filter.
 
 ## [0.4.0](https://github.com/sparr/messagefromaliens-mod-InterfaceTweaks/releases/tag/v0.4.0) - 2026-11-23
 

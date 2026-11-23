@@ -33,7 +33,7 @@ namespace InterfaceTweaks
         private static TextMeshProUGUI text;
         private static Image background;
 
-        private static bool TextFieldFocused()
+        internal static bool TextFieldFocused()
         {
             var selected = EventSystem.current?.currentSelectedGameObject;
             return selected != null && (selected.GetComponent<TMP_InputField>()?.isFocused == true
