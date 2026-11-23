@@ -18,7 +18,6 @@ namespace InterfaceTweaks
             MinesweeperToggles.UpdatePrefix(__instance);
             NotebookTyping.UpdatePrefix(__instance);
             NoteImage.UpdatePrefix(__instance);
-            PageNotes.UpdatePrefix(__instance);
             UndoTranslations.UpdatePrefix(__instance);
         }
 
@@ -37,7 +36,6 @@ namespace InterfaceTweaks
         {
             NotebookTyping.UpdatePostfix(__instance);
             NumberLabels.UpdatePostfix();
-            PageNotes.UpdatePostfix();
         }
 
         [HarmonyFinalizer]
@@ -56,7 +54,6 @@ namespace InterfaceTweaks
         {
             MinesweeperLayout.UpdateText1Prefix();
             NumberLabels.UpdateText1Prefix();
-            PageNotes.UpdateText1Prefix(__instance);
             UndoTranslations.UpdateText1Prefix(__instance);
         }
 
@@ -65,7 +62,6 @@ namespace InterfaceTweaks
         {
             MinesweeperLayout.UpdateText1Postfix(__instance);
             MinesweeperToggles.UpdateText1Postfix(__instance);
-            PageNotes.UpdateText1Postfix();
         }
 
         [HarmonyPostfix]
@@ -88,7 +84,6 @@ namespace InterfaceTweaks
         {
             ChapterNumbers.WritePrefix(__instance, ref s, sec, out __state);
             NoteImage.WritePrefix(__instance, ref s, sec);
-            PageNotes.WritePrefix(__instance, ref s, sec);
             QuizNumberValues.WritePrefix();
             IncrementalLayout.WritePrefix(__instance, ref s, sec);
             RightAlignSettings.WritePrefix(__instance, ref s, sec);

@@ -28,7 +28,6 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> WordUnits;
         internal static ConfigEntry<bool> LoneUnits;
         internal static ConfigEntry<bool> WinPages;
-        internal static ConfigEntry<bool> PageNotes;
         internal static ConfigEntry<bool> NotebookTyping;
         internal static ConfigEntry<bool> NoteImageButton;
         internal static ConfigEntry<bool> CompactMinesweeper;
@@ -66,8 +65,6 @@ namespace InterfaceTweaks
             WinPages = Config.Bind("Chapters", "WinPages", false,
                 Described("At the end of each chapter's menu, list the pages the game showed in the left panel when the chapter's wins reached certain counts, and at the end of a menu, the pages Mod Settings showed there when one of the menu's pages unlocked a mod's feature.", "science unlock", gate: Gates.WinPage,
                     unlock: "plural unlock de page in science"));
-            PageNotes = Config.Bind("Notes", "PageNotes", true,
-                Described("While the left panel shows a page's explanation, the explain button opens a notes page for that page instead, with a field for English text. While a page's notes show, opening another page shows its notes.", "page draw"));
             NotebookTyping = Config.Bind("Notes", "TypeGlyphs", true,
                 Described("While the note editor shows a note, type English to list the glyphs whose translations match, Up and Down to choose one, and Tab to insert it at the cursor.", "word draw", gate: Gates.NoteEditor,
                     unlock: "write word by translate", unlockPage: "home"));
