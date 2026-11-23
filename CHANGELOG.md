@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## [0.3.0](https://github.com/sparr/messagefromaliens-mod-InterfaceTweaks/releases/tag/v0.3.0) - 2026-11-22
+## [0.3.0](https://github.com/sparr/messagefromaliens-mod-InterfaceTweaks/releases/tag/v0.3.0) - 2026-11-23
 
 - Added combined number labels, units written as words, and lone units.
 - Added page notes, typing in notes, and note images.
