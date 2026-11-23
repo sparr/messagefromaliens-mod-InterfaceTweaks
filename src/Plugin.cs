@@ -34,6 +34,7 @@ namespace InterfaceTweaks
         internal static ConfigEntry<bool> CompactMinesweeper;
         internal static ConfigEntry<bool> CenterMinesweeper;
         internal static ConfigEntry<bool> IncrementalColumns;
+        internal static ConfigEntry<bool> RaiseUnderlines;
         internal static ConfigEntry<bool> Hotkeys;
         internal static ConfigEntry<bool> SkipDuplicateHistory;
         internal static ConfigEntry<bool> UndoEnabled;
@@ -82,6 +83,8 @@ namespace InterfaceTweaks
             IncrementalColumns = Config.Bind("Incremental", "FixedColumns", true,
                 Described("In the incremental game, put each row's parts in fixed columns so they stay in place as the numbers grow: the money glyph and amount first, then the time from the seventh cell, and on each building's row its glyph and count first, then the price glyph in the fifth cell and the price after it.", "money position", gate: IncrementalLayout.Gate,
                     unlock: "same position in money enlarge"));
+            RaiseUnderlines = Config.Bind("Underlines", "RaiseWhenLabelsHidden", true,
+                Described("While translations are hidden, draw the lines under links and other underlined glyphs just below the glyphs instead of below the hidden translations.", "line up"));
             Hotkeys = Config.Bind("Keys", "Shortcuts", true,
                 Described("Keyboard shortcuts for the game's own controls. In the number rule game, 1 to 7 enter digits. Page Up and Page Down go to a panel's previous and next page, both in the same panel: the panel last used when both panels have page buttons, so on its first or last page one of them does nothing. Tab and Shift+Tab move between translations through one panel's rows, then the other's.", "button"));
             SkipDuplicateHistory = Config.Bind("History", "SkipDuplicates", true,

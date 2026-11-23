@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added raised underlines while translations are hidden.
+
 ## [0.3.0](https://github.com/sparr/messagefromaliens-mod-InterfaceTweaks/releases/tag/v0.3.0) - 2026-11-23
 
 - Added combined number labels, units written as words, and lone units.

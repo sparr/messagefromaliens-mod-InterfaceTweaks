@@ -93,6 +93,7 @@ namespace InterfaceTweaks
             IncrementalLayout.WritePrefix(__instance, ref s, sec);
             RightAlignSettings.WritePrefix(__instance, ref s, sec);
             UnitTokens.WritePrefix(ref s);
+            RaisedUnderlines.WritePrefix(__instance);
         }
 
         [HarmonyPostfix]
@@ -101,6 +102,10 @@ namespace InterfaceTweaks
             ChapterNumbers.WritePostfix(__instance, sec, __result, __state);
             QuizNumberValues.WritePostfix(__instance, sec);
         }
+
+        // Runs also when the game's Write throws, so each prefix's record is removed.
+        [HarmonyFinalizer]
+        private static void Finalizer(Draw __instance) => RaisedUnderlines.WriteFinalizer(__instance);
     }
 
     [HarmonyPatch(typeof(AlienCharacter), nameof(AlienCharacter.UpdateEarthText))]
