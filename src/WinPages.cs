@@ -207,6 +207,31 @@ namespace InterfaceTweaks
             return pages.TryGetValue(name, out var page) ? page : null;
         }
 
+        // The names of the win pages the player has unlocked and of Mod Settings' pages for
+        // page-gated unlock messages, each while it has text, whether or not this tweak lists
+        // them in menus.
+        internal static IEnumerable<string> Shown()
+        {
+            Index();
+            foreach (var page in pages.Values)
+            {
+                if (Unlocked(page) && !string.IsNullOrEmpty(Global.GetInfo(GameText.InfoCategory, page.Name)))
+                {
+                    yield return page.Name;
+                }
+            }
+            foreach (var names in termMenus.Values)
+            {
+                foreach (var name in names)
+                {
+                    if (!string.IsNullOrEmpty(Global.GetInfo(GameText.InfoCategory, name)))
+                    {
+                        yield return name;
+                    }
+                }
+            }
+        }
+
         private static string Line(string name) => " " + GameText.Newline + " " + string.Join(" ", Global.StringToListString(name));
 
         // Adds the unlocked win pages to the end of the menu's lines.

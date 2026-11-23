@@ -20,6 +20,8 @@ namespace InterfaceTweaks
         // name after its page's name.
         internal const string InfoCategory = "alieninfo";
         internal const string ExplanationSuffix = " de tutorial";
+        // The dictionary page.
+        internal const string Dictionary = "language de book";
         // The kind of a value token, "(value)number", which Global.StringToListString inserts
         // for a number's glyph and which becomes that glyph's extra_info.
         internal const string ValueKind = "number";

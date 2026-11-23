@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added dictionary search.
+
 ## [0.4.0](https://github.com/sparr/messagefromaliens-mod-InterfaceTweaks/releases/tag/v0.4.0) - 2026-11-23
 
 - Added raised underlines while translations are hidden.

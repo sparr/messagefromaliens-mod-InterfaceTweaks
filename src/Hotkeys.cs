@@ -24,7 +24,6 @@ namespace InterfaceTweaks
     internal static class Hotkeys
     {
         private const string RulePage = "understand rule";
-        private const string Dictionary = "language de book";
         private const string PrevPage = "prevword";
         private const string NextPage = "nextword";
 
@@ -119,7 +118,7 @@ namespace InterfaceTweaks
         // As Draw.Update does for a click on the right menu's page glyph.
         private static void PageRight(Draw d, bool next)
         {
-            if (d.current_page == Dictionary || IsEditNote(d))
+            if (d.current_page == GameText.Dictionary || IsEditNote(d))
             {
                 d.currentrightpageup += next ? 1 : -1;
                 d.UpdateText();

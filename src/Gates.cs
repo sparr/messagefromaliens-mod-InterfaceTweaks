@@ -18,6 +18,9 @@ namespace InterfaceTweaks
         // The first page the game shows in the left panel for a chapter's win count.
         internal const string WinPage = "[arithmetic-riddle-3]";
 
+        // The home menu's line for the dictionary.
+        internal const string Dictionary = "[arithmetic-riddle-3]";
+
         // The home menu's line for the note editor.
         internal const string NoteEditor = "[last-riddle]";
     }
